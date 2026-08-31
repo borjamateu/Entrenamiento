@@ -233,7 +233,7 @@ const PLAN = {
           {id:"f1_lu_2", name:"Press banca", target:"3×8 @ RPE 6"},
           {id:"f1_lu_3", name:"Remo con barra", target:"3×10"},
           {id:"f1_lu_4", name:"Peso muerto rumano", target:"2×10"},
-          {id:"f1_lu_5", name:"Plancha", target:"3×30-40s"},
+          {id:"f1_lu_5", name:"Plancha", target:"3×30-40s", mode:"time"},
         ]},
       { day:"Martes", name:"Carrera suave", dur:"30-40 min", focus:"Z2, rodar", simple:true },
       { day:"Miércoles", name:"Fuerza B (Full body)", dur:"45-50 min", focus:"Técnica + volumen moderado",
@@ -241,7 +241,7 @@ const PLAN = {
           {id:"f1_mi_1", name:"Peso muerto convencional", target:"3×6 @ RPE 6"},
           {id:"f1_mi_2", name:"Press militar mancuernas", target:"3×8"},
           {id:"f1_mi_3", name:"Dominadas asistidas / remo polea", target:"3×8-10"},
-          {id:"f1_mi_4", name:"Zancadas con mancuerna", target:"2×10/pierna"},
+          {id:"f1_mi_4", name:"Zancadas con mancuerna", target:"2×10/pierna", mode:"unilateral"},
           {id:"f1_mi_5", name:"Kettlebell swing", target:"3×15"},
         ]},
       { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 + 10 min core", simple:true },
@@ -251,7 +251,7 @@ const PLAN = {
           {id:"f1_vi_2", name:"Press inclinado mancuernas", target:"3×10"},
           {id:"f1_vi_3", name:"Face pull en polea", target:"3×15"},
           {id:"f1_vi_4", name:"Hip thrust", target:"3×10"},
-          {id:"f1_vi_5", name:"Farmer carry", target:"3×30m"},
+          {id:"f1_vi_5", name:"Farmer carry", target:"3×30m", mode:"carry"},
         ]},
       { day:"Sábado", name:"Carrera larga suave", dur:"40-60 min", focus:"Z2, sin reloj de ritmo", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad + remo/bici muy suave", simple:true },
@@ -265,7 +265,7 @@ const PLAN = {
           {id:"f2_lu_1", name:"Sentadilla trasera", target:"RPE 7, subir carga"},
           {id:"f2_lu_2", name:"Press banca", target:"RPE 7"},
           {id:"f2_lu_3", name:"Press militar", target:"3×8"},
-          {id:"f2_lu_4", name:"Zancadas", target:"3×10/pierna"},
+          {id:"f2_lu_4", name:"Zancadas", target:"3×10/pierna", mode:"unilateral"},
         ]},
       { day:"Martes", name:"Carrera calidad (series)", dur:"35-40 min", focus:"6×400m ritmo rápido, rec. 90s", simple:true },
       { day:"Miércoles", name:"Fuerza B (Tirón/pierna)", dur:"50-60 min", focus:"Fuerza, RPE 7",
@@ -288,7 +288,7 @@ const PLAN = {
         exercises:[
           {id:"f3_lu_1", name:"Sentadilla trasera", target:"RPE 8"},
           {id:"f3_lu_2", name:"Peso muerto rumano", target:"3×8"},
-          {id:"f3_lu_3", name:"Zancadas búlgaras", target:"3×8/pierna"},
+          {id:"f3_lu_3", name:"Zancadas búlgaras", target:"3×8/pierna", mode:"unilateral"},
         ]},
       { day:"Martes", name:"Carrera calidad (tempo)", dur:"35-40 min", focus:"Ritmo umbral", simple:true },
       { day:"Miércoles", name:"Fuerza pesada (torso)", dur:"50-60 min", focus:"RPE 8",
@@ -496,12 +496,12 @@ async function renderDayBody(d, idx){
     let html = '';
     for(const ex of d.exercises){
       const exLog = log[ex.id] || {};
-      const lastNote = await getLastExerciseNote(ex.id, dateKey);
-      html += exerciseRowHtml(ex.id, ex.name, ex.target, exLog, lastNote);
+      const lastNote = await getLastExerciseNote(ex.id, dateKey, ex.mode);
+      html += exerciseRowHtml(ex.id, ex.name, ex.target, exLog, lastNote, ex.mode);
     }
     customList.forEach(ex=>{
       const exLog = log[ex.id] || {};
-      html += exerciseRowHtml(ex.id, ex.name, 'Ejercicio añadido', exLog, null);
+      html += exerciseRowHtml(ex.id, ex.name, 'Ejercicio añadido', exLog, null, ex.mode);
     });
     html += `<button class="add-ex-btn" id="addExBtn_${idx}">+ Añadir ejercicio</button>`;
     html += `
@@ -555,14 +555,13 @@ async function renderDayBody(d, idx){
       const allEx = d.exercises.concat(customList);
       allEx.forEach(ex=>{
         const checkEl = body.querySelector(`.ex-check[data-exid="${ex.id}"]`);
-        const pesoEl = body.querySelector(`input[data-field="peso"][data-exid="${ex.id}"]`);
-        const repsEl = body.querySelector(`input[data-field="reps"][data-exid="${ex.id}"]`);
         if(checkEl){
-          l[ex.id] = {
-            done: checkEl.classList.contains('done'),
-            peso: pesoEl.value,
-            reps: repsEl.value
-          };
+          const entry = { done: checkEl.classList.contains('done') };
+          fieldsForMode(ex.mode).forEach(f=>{
+            const el = body.querySelector(`input[data-field="${f.key}"][data-exid="${ex.id}"]`);
+            entry[f.key] = el ? el.value : '';
+          });
+          l[ex.id] = entry;
         }
       });
       l[commentKey] = document.getElementById(`comment_${idx}`).value;
@@ -578,18 +577,20 @@ async function renderDayBody(d, idx){
   updateBadge(idx);
 }
 
-async function getLastExerciseNote(exId, beforeDateKey){
+async function getLastExerciseNote(exId, beforeDateKey, mode){
   try{
     const list = await window.storage.list('log:');
     if(!list || !list.keys) return null;
     const keys = list.keys.map(k=> k.startsWith('log:')?k:'log:'+k).filter(k=> k.replace('log:','') < beforeDateKey).sort().reverse();
+    const fields = fieldsForMode(mode);
     for(const k of keys.slice(0,14)){
       try{
         const res = await window.storage.get(k);
         if(!res) continue;
         const log = JSON.parse(res.value);
-        if(log[exId] && (log[exId].peso || log[exId].reps)){
-          return `Última vez: ${log[exId].peso?log[exId].peso+'kg ':''}${log[exId].reps||''}`;
+        if(log[exId] && fields.some(f=> log[exId][f.key])){
+          const val = formatLogValue(fields, log[exId]);
+          if(val) return `Última vez: ${val}`;
         }
       }catch(e){ continue; }
     }
@@ -597,7 +598,43 @@ async function getLastExerciseNote(exId, beforeDateKey){
   return null;
 }
 
-function exerciseRowHtml(id, name, target, exLog, lastNote){
+function fieldsForMode(mode){
+  switch(mode){
+    case 'unilateral':
+      return [
+        {key:'peso', label:'Peso (kg)', type:'number', inputmode:'decimal'},
+        {key:'repsL', label:'Reps izq.', type:'text', inputmode:'text'},
+        {key:'repsR', label:'Reps der.', type:'text', inputmode:'text'},
+      ];
+    case 'time':
+      return [
+        {key:'segundos', label:'Segundos (total)', type:'number', inputmode:'numeric'},
+      ];
+    case 'carry':
+      return [
+        {key:'peso', label:'Peso/mano (kg)', type:'number', inputmode:'decimal'},
+        {key:'distancia', label:'Distancia (m)', type:'text', inputmode:'text'},
+      ];
+    default:
+      return [
+        {key:'peso', label:'Peso (kg)', type:'number', inputmode:'decimal'},
+        {key:'reps', label:'Reps', type:'text', inputmode:'text'},
+      ];
+  }
+}
+
+function formatLogValue(fields, exLog){
+  return fields.map(f=> exLog[f.key] ? `${exLog[f.key]}${f.key==='peso'?'kg':(f.key==='segundos'?'s':(f.key==='distancia'?'m':''))}` : null)
+    .filter(Boolean).join(' · ');
+}
+
+function exerciseRowHtml(id, name, target, exLog, lastNote, mode){
+  const fields = fieldsForMode(mode);
+  const inputsHtml = fields.map(f=>`
+    <div style="flex:1">
+      <label>${f.label}</label>
+      <input type="${f.type}" inputmode="${f.inputmode}" placeholder="—" data-field="${f.key}" data-exid="${id}" value="${exLog[f.key]||''}">
+    </div>`).join('');
   return `
     <div class="exercise">
       <div class="ex-top">
@@ -608,16 +645,7 @@ function exerciseRowHtml(id, name, target, exLog, lastNote){
         </div>
         <div class="ex-check ${exLog.done?'done':''}" data-exid="${id}">${exLog.done?'✓':''}</div>
       </div>
-      <div class="ex-inputs">
-        <div style="flex:1">
-          <label>Peso (kg)</label>
-          <input type="number" inputmode="decimal" placeholder="—" data-field="peso" data-exid="${id}" value="${exLog.peso||''}">
-        </div>
-        <div style="flex:1">
-          <label>Reps</label>
-          <input type="text" inputmode="text" placeholder="—" data-field="reps" data-exid="${id}" value="${exLog.reps||''}">
-        </div>
-      </div>
+      <div class="ex-inputs">${inputsHtml}</div>
     </div>`;
 }
 
@@ -750,8 +778,9 @@ async function renderHistory(){
         } else if(key.startsWith('p') && key.includes('_d')){
           if(val && val.done) lines += `<div class="hist-line"><span>Sesión completada</span><span>✓</span></div>`;
         } else {
-          if(val && (val.done || val.peso || val.reps)){
-            lines += `<div class="hist-line"><span>${exNameFromId(key, log)}</span><span>${val.peso? val.peso+'kg ' : ''}${val.reps||''}</span></div>`;
+          if(val && (val.done || hasLoggedValue(val))){
+            const valText = formatLogValue(fieldsForMode(exModeFromId(key)), val);
+            lines += `<div class="hist-line"><span>${exNameFromId(key, log)}</span><span>${valText}</span></div>`;
           }
         }
       });
@@ -790,7 +819,7 @@ async function buildExportText(all){
     out += '\n';
   }
   all.forEach(({dateKey, log})=>{
-    const entries = Object.entries(log).filter(([k,v])=> v && (v.done || v.peso || v.reps || (typeof v === 'string' && v.trim())));
+    const entries = Object.entries(log).filter(([k,v])=> v && (v.done || hasLoggedValue(v) || (typeof v === 'string' && v.trim())));
     if(entries.length===0) return;
     out += `${dateKey}\n`;
     entries.forEach(([key,val])=>{
@@ -800,12 +829,30 @@ async function buildExportText(all){
       } else if(key.startsWith('p') && key.includes('_d')){
         if(val.done) out += `  Sesión marcada como completada\n`;
       } else {
-        out += `  ${exNameFromId(key, log)}: ${val.peso?val.peso+'kg ':''}${val.reps||''}${val.done?' (hecho)':''}\n`;
+        const valText = formatLogValue(fieldsForMode(exModeFromId(key)), val);
+        out += `  ${exNameFromId(key, log)}: ${valText}${val.done?' (hecho)':''}\n`;
       }
     });
     out += '\n';
   });
   return out;
+}
+
+function exModeFromId(id){
+  for(const phase of Object.values(PLAN)){
+    for(const day of phase.days){
+      if(day.exercises){
+        const found = day.exercises.find(e=>e.id===id);
+        if(found) return found.mode;
+      }
+    }
+  }
+  return undefined;
+}
+
+function hasLoggedValue(v){
+  if(!v || typeof v !== 'object') return false;
+  return Object.keys(v).some(k=> k!=='done' && v[k]);
 }
 
 function exNameFromId(id, log){
