@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Entreno">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 <title>Plan de entrenamiento</title>
 <style>
   :root{
@@ -268,7 +276,16 @@
 
 <div id="progView" class="prog-view" style="display:none;"></div>
 
-<div id="historyView" class="history" style="display:none;"></div>
+<div id="historyView" class="history" style="display:none;">
+  <div class="prog-card" style="margin-bottom:14px;">
+    <div class="prog-title">Copia de seguridad</div>
+    <div class="prog-sub">Tus datos viven solo en este navegador. Descarga una copia de vez en cuando por si acaso.</div>
+    <button class="add-ex-btn" id="backupDownloadBtn" style="margin-top:2px;">⬇ Descargar copia de seguridad</button>
+    <button class="add-ex-btn" id="backupRestoreBtn" style="margin-top:8px;">⬆ Restaurar copia de seguridad</button>
+    <input type="file" id="backupFileInput" accept="application/json" style="display:none;">
+  </div>
+  <div id="historyList"></div>
+</div>
 
 <div id="weightView" class="weight-view" style="display:none;">
   <div class="weight-form">
@@ -324,6 +341,12 @@ if(!window.storage){
       }catch(e){ return { keys: [] }; }
     }
   };
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
 }
 
 const PLAN = {
@@ -715,6 +738,7 @@ async function renderDayBody(d, idx){
       const exLog = log[ex.id] || {};
       html += exerciseRowHtml(ex.id, ex.name, 'Ejercicio añadido', exLog, null, ex.mode);
     });
+    html += `<button class="add-ex-btn" id="fillLastBtn_${idx}">↻ Rellenar con la última sesión</button>`;
     html += `<button class="add-ex-btn" id="addExBtn_${idx}">+ Añadir ejercicio</button>`;
     html += `
       <div class="comment-box">
@@ -730,6 +754,17 @@ async function renderDayBody(d, idx){
         el.textContent = el.classList.contains('done') ? '✓' : '';
       };
     });
+
+    document.getElementById(`fillLastBtn_${idx}`).onclick = async ()=>{
+      for(const ex of d.exercises){
+        const last = await getLastExerciseLog(ex.id, dateKey);
+        if(!last) continue;
+        fieldsForMode(ex.mode).forEach(f=>{
+          const el = body.querySelector(`input[data-field="${f.key}"][data-exid="${ex.id}"]`);
+          if(el && !el.value && last[f.key]) el.value = last[f.key];
+        });
+      }
+    };
 
     document.getElementById(`addExBtn_${idx}`).onclick = ()=>{
       const wrap = document.createElement('div');
@@ -765,7 +800,8 @@ async function renderDayBody(d, idx){
     document.getElementById(`saveBtn_${idx}`).onclick = async ()=>{
       const l = await loadLog(dateKey);
       const allEx = d.exercises.concat(customList);
-      allEx.forEach(ex=>{
+      const prHits = [];
+      for(const ex of allEx){
         const checkEl = body.querySelector(`.ex-check[data-exid="${ex.id}"]`);
         if(checkEl){
           const entry = { done: checkEl.classList.contains('done') };
@@ -773,15 +809,23 @@ async function renderDayBody(d, idx){
             const el = body.querySelector(`input[data-field="${f.key}"][data-exid="${ex.id}"]`);
             entry[f.key] = el ? el.value : '';
           });
+          const field = primaryFieldForMode(ex.mode);
+          const newVal = parseFloat(entry[field]);
+          if(!isNaN(newVal)){
+            const best = await getBestExerciseValue(ex.id, dateKey, ex.mode);
+            if(best!==null && newVal>best) prHits.push(ex.name);
+          }
           l[ex.id] = entry;
         }
-      });
+      }
       l[commentKey] = document.getElementById(`comment_${idx}`).value;
       l[customListKey] = customList;
       await saveLog(dateKey, l);
       const note = document.getElementById(`savedNote_${idx}`);
+      note.textContent = prHits.length ? `🏆 ¡Nuevo PR en ${prHits.join(', ')}!` : 'Guardado';
+      note.style.color = prHits.length ? 'var(--amber)' : 'var(--green)';
       note.style.display = 'block';
-      setTimeout(()=>{ note.style.display = 'none'; }, 1800);
+      setTimeout(()=>{ note.style.display = 'none'; }, prHits.length ? 3200 : 1800);
       updateBadge(idx);
       renderSummary();
     };
@@ -789,25 +833,52 @@ async function renderDayBody(d, idx){
   updateBadge(idx);
 }
 
-async function getLastExerciseNote(exId, beforeDateKey, mode){
+async function getLastExerciseLog(exId, beforeDateKey){
   try{
     const list = await window.storage.list('log:');
     if(!list || !list.keys) return null;
     const keys = list.keys.map(k=> k.startsWith('log:')?k:'log:'+k).filter(k=> k.replace('log:','') < beforeDateKey).sort().reverse();
-    const fields = fieldsForMode(mode);
-    for(const k of keys.slice(0,14)){
+    for(const k of keys.slice(0,30)){
       try{
         const res = await window.storage.get(k);
         if(!res) continue;
         const log = JSON.parse(res.value);
-        if(log[exId] && fields.some(f=> log[exId][f.key])){
-          const val = formatLogValue(fields, log[exId]);
-          if(val) return `Última vez: ${val}`;
-        }
+        if(log[exId] && hasLoggedValue(log[exId])) return log[exId];
       }catch(e){ continue; }
     }
   }catch(e){}
   return null;
+}
+
+async function getLastExerciseNote(exId, beforeDateKey, mode){
+  const entry = await getLastExerciseLog(exId, beforeDateKey);
+  if(!entry) return null;
+  const val = formatLogValue(fieldsForMode(mode), entry);
+  return val ? `Última vez: ${val}` : null;
+}
+
+async function getBestExerciseValue(exId, beforeDateKey, mode){
+  try{
+    const list = await window.storage.list('log:');
+    if(!list || !list.keys) return null;
+    const field = primaryFieldForMode(mode);
+    let best = null;
+    for(const k of list.keys){
+      const fullKey = k.startsWith('log:') ? k : 'log:' + k;
+      const dateKey = fullKey.replace('log:','');
+      if(dateKey >= beforeDateKey) continue;
+      try{
+        const res = await window.storage.get(fullKey);
+        if(!res) continue;
+        const log = JSON.parse(res.value);
+        if(log[exId] && log[exId][field]){
+          const v = parseFloat(log[exId][field]);
+          if(!isNaN(v) && (best===null || v>best)) best = v;
+        }
+      }catch(e){ continue; }
+    }
+    return best;
+  }catch(e){ return null; }
 }
 
 async function updateBadge(idx){
@@ -1213,7 +1284,7 @@ document.getElementById('weightSaveBtn').onclick = async ()=>{
 /* ---------- HISTORIAL / EXPORT ---------- */
 
 async function renderHistory(){
-  const container = document.getElementById('historyView');
+  const container = document.getElementById('historyList');
   container.innerHTML = '<div class="hist-empty">Cargando...</div>';
   try{
     const all = await collectAllLogs();
@@ -1298,6 +1369,50 @@ function formatDate(dateStr){
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
 }
+
+function backupAllData(){
+  const data = {};
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    data[k] = localStorage.getItem(k);
+  }
+  return data;
+}
+
+function downloadBackup(){
+  const data = backupAllData();
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `entrenamiento-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function restoreBackupFile(file){
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      Object.entries(data).forEach(([k,v])=> localStorage.setItem(k, v));
+      alert('Copia restaurada correctamente. La app se va a recargar.');
+      location.reload();
+    }catch(err){
+      alert('El archivo no es una copia de seguridad válida.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('backupDownloadBtn').onclick = downloadBackup;
+document.getElementById('backupRestoreBtn').onclick = ()=> document.getElementById('backupFileInput').click();
+document.getElementById('backupFileInput').addEventListener('change', (e)=>{
+  if(e.target.files[0]) restoreBackupFile(e.target.files[0]);
+});
 
 document.getElementById('datePicker').addEventListener('change', (e)=>{
   currentDate = e.target.value;
