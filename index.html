@@ -288,6 +288,44 @@
 </div>
 
 <script>
+/* ---------- CAPA DE ALMACENAMIENTO ----------
+   Esta app vive en GitHub Pages (fuera del entorno de artifacts de Claude),
+   así que usa localStorage real del navegador. Si en algún momento se abre
+   dentro del visor de artifacts de Claude, usa el storage que ese entorno
+   ya proporciona en su lugar. */
+if(!window.storage){
+  window.storage = {
+    async get(key){
+      try{
+        const v = localStorage.getItem(key);
+        return v===null ? null : { key, value:v };
+      }catch(e){ return null; }
+    },
+    async set(key, value){
+      try{
+        localStorage.setItem(key, value);
+        return { key, value };
+      }catch(e){ return null; }
+    },
+    async delete(key){
+      try{
+        localStorage.removeItem(key);
+        return { key, deleted:true };
+      }catch(e){ return null; }
+    },
+    async list(prefix){
+      try{
+        const keys = [];
+        for(let i=0;i<localStorage.length;i++){
+          const k = localStorage.key(i);
+          if(!prefix || k.startsWith(prefix)) keys.push(k);
+        }
+        return { keys };
+      }catch(e){ return { keys: [] }; }
+    }
+  };
+}
+
 const PLAN = {
   1: {
     label: "Fase 1 · Reacondicionamiento",
@@ -1114,6 +1152,27 @@ async function seedInitialWeight(){
   }catch(e){}
 }
 
+async function seedTodaySession(){
+  const flagKey = 'seeded_20260831_v1';
+  const already = await window.storage.get(flagKey);
+  if(already) return;
+  const dateKey = '2026-08-31';
+  const l = await loadLog(dateKey);
+  if(!l['f1_lu_1']) l['f1_lu_1'] = { done:false, peso:'20', reps:'30' };
+  if(!l['f1_lu_2']) l['f1_lu_2'] = { done:true, peso:'55', reps:'40' };
+  if(!l['f1_lu_3']) l['f1_lu_3'] = { done:false, peso:'35', reps:'30' };
+  if(!l['f1_lu_4']) l['f1_lu_4'] = { done:true, peso:'10', reps:'60' };
+  if(!l['f1_lu_5']) l['f1_lu_5'] = { done:false, segundos:'90' };
+  const commentKey = 'comment_p1_d0';
+  const runNote = 'Trote por montaña: 2 km a ritmo 5:20/km';
+  const existingComment = l[commentKey] || '';
+  if(!existingComment.includes(runNote)){
+    l[commentKey] = existingComment ? existingComment + ' | ' + runNote : runNote;
+  }
+  await saveLog(dateKey, l);
+  await window.storage.set(flagKey, '1');
+}
+
 async function renderWeightView(){
   document.getElementById('weightDate').value = todayStr();
   const list = document.getElementById('weightList');
@@ -1247,6 +1306,7 @@ document.getElementById('datePicker').addEventListener('change', (e)=>{
 
 (async function init(){
   await seedInitialWeight();
+  await seedTodaySession();
   buildPhaseRow();
   goToday();
 })();
