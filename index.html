@@ -839,16 +839,24 @@ function stretchKeyFor(d){
 }
 
 let currentPhase = 1;
-let currentDate = new Date().toISOString().slice(0,10);
 let calYear, calMonth;
 let progSelectedName = null;
 
-function todayStr(){ return new Date().toISOString().slice(0,10); }
+function toLocalISO(date){
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+
+function todayStr(){ return toLocalISO(new Date()); }
 function daysAgoStr(n){
   const d = new Date();
   d.setDate(d.getDate()-n);
-  return d.toISOString().slice(0,10);
+  return toLocalISO(d);
 }
+
+let currentDate = todayStr();
 
 function goToday(){
   currentDate = todayStr();
@@ -955,7 +963,7 @@ async function renderSummary(){
   for(let i=0;i<7;i++){
     const d = new Date(monday);
     d.setDate(d.getDate()+i);
-    const dateKey = d.toISOString().slice(0,10);
+    const dateKey = toLocalISO(d);
     if(dateKey <= todayStr()){
       if(await dayHasActivity(dateKey)) completed++;
     }
@@ -1109,7 +1117,7 @@ function dateForWeekIdx(idx){
   const monday = mondayOfWeek(currentDate);
   const d = new Date(monday);
   d.setDate(d.getDate() + idx);
-  return d.toISOString().slice(0,10);
+  return toLocalISO(d);
 }
 
 async function renderDayBody(d, idx){
@@ -1408,7 +1416,7 @@ async function renderCalendar(){
   });
 
   const firstDay = new Date(calYear, calMonth, 1);
-  const startPad = weekdayIndexFromDate(firstDay.toISOString().slice(0,10));
+  const startPad = weekdayIndexFromDate(toLocalISO(firstDay));
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
 
   for(let i=0;i<startPad;i++){
@@ -1420,7 +1428,7 @@ async function renderCalendar(){
   const today = todayStr();
   for(let day=1; day<=daysInMonth; day++){
     const dateObj = new Date(calYear, calMonth, day);
-    const dateKey = dateObj.toISOString().slice(0,10);
+    const dateKey = toLocalISO(dateObj);
     const cell = document.createElement('div');
     cell.innerHTML = `<span class="cal-num">${day}</span>`;
     let cls = 'cal-cell';
@@ -1602,7 +1610,7 @@ function sumKmInRange(series, startStr, endStr){
 async function kmThisWeek(){
   const series = await getKmSeries();
   const monday = mondayOfWeek(todayStr());
-  const mondayStr = monday.toISOString().slice(0,10);
+  const mondayStr = toLocalISO(monday);
   return Math.round(sumKmInRange(series, mondayStr, todayStr()) * 10) / 10;
 }
 
@@ -1618,7 +1626,7 @@ async function renderComparativaCard(){
   let myDays = 0;
   for(let i=0;i<7;i++){
     const d = new Date(monday); d.setDate(d.getDate()+i);
-    const dk = d.toISOString().slice(0,10);
+    const dk = toLocalISO(d);
     if(dk<=todayStr() && await dayHasActivity(dk)) myDays++;
   }
 
@@ -1695,7 +1703,7 @@ async function renderProgress(){
     for(let i=0;i<7;i++){
       const d = new Date(start);
       d.setDate(d.getDate()+i);
-      const dateKey = d.toISOString().slice(0,10);
+      const dateKey = toLocalISO(d);
       if(dateKey <= todayStr() && await dayHasActivity(dateKey)) count++;
     }
     weeklyBars.push({ label: `${start.getDate()}/${start.getMonth()+1}`, value: Math.round(count/7*100) });
@@ -1706,9 +1714,9 @@ async function renderProgress(){
   for(let w=7; w>=0; w--){
     const start = new Date(monday);
     start.setDate(start.getDate() - w*7);
-    const startStr = start.toISOString().slice(0,10);
+    const startStr = toLocalISO(start);
     const end = new Date(start); end.setDate(end.getDate()+6);
-    const endStr = end.toISOString().slice(0,10);
+    const endStr = toLocalISO(end);
     const total = Math.round(sumKmInRange(kmSeries, startStr, endStr) * 10) / 10;
     weeklyKmBars.push({ label: `${start.getDate()}/${start.getMonth()+1}`, value: total });
   }
