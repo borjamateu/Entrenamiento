@@ -975,7 +975,13 @@ async function renderSummary(){
     weightHtml = `<span class="summary-value">${last.kg} kg</span>${deltaHtml}`;
   }
 
+  const todayDone = await dayHasActivity(todayStr());
+
   row.innerHTML = `
+    <div class="summary-card">
+      <div class="summary-label">Hoy</div>
+      <div class="summary-value ${todayDone?'':'small'}" style="${todayDone?'color:var(--green);':''}">${todayDone ? '✓ Hecho' : 'Pendiente'}</div>
+    </div>
     <div class="summary-card">
       <div class="summary-label">Esta semana</div>
       <div class="summary-value">${completed}/7</div>
@@ -1099,9 +1105,16 @@ function exerciseRowHtml(id, name, target, exLog, lastNote, mode){
     </div>`;
 }
 
+function dateForWeekIdx(idx){
+  const monday = mondayOfWeek(currentDate);
+  const d = new Date(monday);
+  d.setDate(d.getDate() + idx);
+  return d.toISOString().slice(0,10);
+}
+
 async function renderDayBody(d, idx){
   const body = document.getElementById(`body_${currentPhase}_${idx}`);
-  const dateKey = currentDate;
+  const dateKey = dateForWeekIdx(idx);
   const log = await loadLog(dateKey);
   const dayLogKey = `p${currentPhase}_d${idx}`;
   const customListKey = `customlist_${dayLogKey}`;
@@ -1113,10 +1126,19 @@ async function renderDayBody(d, idx){
     const done = !!(log[dayLogKey] && log[dayLogKey].done);
     const stretchKey = `stretch_${dayLogKey}`;
     const stretchDone = !!(log[stretchKey] && log[stretchKey].done);
+    const isRun = dayTypeClass(d) === 'type-carrera';
+    const savedKm = (log[dayLogKey] && log[dayLogKey].km) || '';
+    const savedRitmo = (log[dayLogKey] && log[dayLogKey].ritmo) || '';
+    const runFieldsHtml = isRun ? `
+      <div class="ex-inputs" style="margin-top:10px;">
+        <div style="flex:1"><label>Distancia (km)</label><input type="number" inputmode="decimal" placeholder="—" id="kmInput_${idx}" value="${savedKm}"></div>
+        <div style="flex:1"><label>Ritmo medio (min/km)</label><input type="text" placeholder="—" id="ritmoInput_${idx}" value="${savedRitmo}"></div>
+      </div>` : '';
     body.innerHTML = `
       <button class="simple-toggle ${done?'done':''}" id="simpleBtn_${idx}">
         ${done ? '✓ Sesión completada' : 'Marcar como hecha'}
       </button>
+      ${runFieldsHtml}
       <div class="comment-box">
         <label>Comentario / sensaciones</label>
         <textarea id="comment_${idx}" placeholder="Ritmo, sensación, molestias... o si has aprovechado para meter algo extra (fuerza, estiramientos, lo que sea)">${commentVal}</textarea>
@@ -1136,7 +1158,14 @@ async function renderDayBody(d, idx){
       const l = await loadLog(dateKey);
       const btn = document.getElementById(`simpleBtn_${idx}`);
       const sBtn = document.getElementById(`stretchBtn_${idx}`);
-      l[dayLogKey] = { done: btn.classList.contains('done') };
+      const entry = { done: btn.classList.contains('done') };
+      if(isRun){
+        const kmEl = document.getElementById(`kmInput_${idx}`);
+        const ritmoEl = document.getElementById(`ritmoInput_${idx}`);
+        entry.km = kmEl ? kmEl.value : '';
+        entry.ritmo = ritmoEl ? ritmoEl.value : '';
+      }
+      l[dayLogKey] = entry;
       l[stretchKey] = { done: sBtn.classList.contains('done') };
       l[commentKey] = document.getElementById(`comment_${idx}`).value;
       await saveLog(dateKey, l);
@@ -1317,7 +1346,7 @@ async function updateBadge(idx){
   const nameEl = document.getElementById(`dayname_${idx}`);
   if(!badge) return;
   const d = plan()[currentPhase].days[idx];
-  const done = await dayIsDone(currentDate, currentPhase, idx, d);
+  const done = await dayIsDone(dateForWeekIdx(idx), currentPhase, idx, d);
   badge.classList.toggle('done', done);
   badge.textContent = done ? '✓' : '';
   if(nameEl) nameEl.classList.toggle('done-strike', done);
@@ -1451,19 +1480,21 @@ function svgLineChart(points, opts){
     </svg>`;
 }
 
-function svgBarChart(bars){
-  const w = 320, h = 130, padL = 8, padR = 8, padT = 10, padB = 22;
+function svgBarChart(bars, opts){
+  opts = opts || {};
+  const w = 320, h = 130, padL = 8, padR = 8, padT = 16, padB = 22;
   if(bars.length===0) return '<div class="prog-empty">Sin datos suficientes.</div>';
   const barW = (w - padL - padR) / bars.length * 0.62;
   const gap = (w - padL - padR) / bars.length;
-  const maxV = 100;
+  const maxV = opts.maxV || Math.max(...bars.map(b=>b.value), 1);
   const bodyH = h - padT - padB;
   const rects = bars.map((b,i)=>{
     const x = padL + i*gap + (gap-barW)/2;
-    const bh = (b.value/maxV) * bodyH;
+    const bh = maxV>0 ? (b.value/maxV) * bodyH : 0;
     const y = padT + (bodyH - bh);
-    const color = b.value>=85 ? 'var(--green)' : (b.value>=50 ? 'var(--accent)' : 'var(--amber)');
-    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${color}"/>
+    const color = opts.flat ? 'var(--accent)' : (b.value>=85 ? 'var(--green)' : (b.value>=50 ? 'var(--accent)' : 'var(--amber)'));
+    const valueLabel = opts.showValue && b.value>0 ? `<text x="${(x+barW/2).toFixed(1)}" y="${(y-3).toFixed(1)}" fill="#9aa3b5" font-size="8" text-anchor="middle">${b.value}</text>` : '';
+    return `${valueLabel}<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${color}"/>
       <text x="${(x+barW/2).toFixed(1)}" y="${h-6}" fill="#5d6474" font-size="8.5" text-anchor="middle">${b.label}</text>`;
   }).join('');
   return `<svg viewBox="0 0 ${w} ${h}" style="width:100%; height:auto;">${rects}</svg>`;
@@ -1549,6 +1580,32 @@ function formatDateShort(dateStr){
   return d.toLocaleDateString('es-ES', { day:'numeric', month:'short' });
 }
 
+async function getKmSeries(){
+  const all = await collectAllLogs();
+  const chrono = [...all].reverse();
+  const points = [];
+  chrono.forEach(({dateKey, log})=>{
+    Object.entries(log).forEach(([key,val])=>{
+      if(/^p\d+_d\d+$/.test(key) && val && val.km){
+        const km = parseFloat(val.km);
+        if(!isNaN(km)) points.push({ date:dateKey, km });
+      }
+    });
+  });
+  return points;
+}
+
+function sumKmInRange(series, startStr, endStr){
+  return series.filter(p=> p.date>=startStr && p.date<=endStr).reduce((s,p)=> s+p.km, 0);
+}
+
+async function kmThisWeek(){
+  const series = await getKmSeries();
+  const monday = mondayOfWeek(todayStr());
+  const mondayStr = monday.toISOString().slice(0,10);
+  return Math.round(sumKmInRange(series, mondayStr, todayStr()) * 10) / 10;
+}
+
 async function renderComparativaCard(){
   let data = null;
   try{
@@ -1564,6 +1621,8 @@ async function renderComparativaCard(){
     const dk = d.toISOString().slice(0,10);
     if(dk<=todayStr() && await dayHasActivity(dk)) myDays++;
   }
+
+  const myKm = await kmThisWeek();
 
   const other = currentUser==='borja' ? 'tati' : 'borja';
   const otherData = data && data[other] ? data[other] : null;
@@ -1599,6 +1658,18 @@ async function renderComparativaCard(){
           <div class="compare-sub">esta semana</div>
         </div>
       </div>
+      <div class="compare-row">
+        <div class="compare-col">
+          <div class="compare-name">${USER_LABEL[currentUser]} (tú)</div>
+          <div class="compare-val">${myKm} km</div>
+          <div class="compare-sub">corridos esta semana</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-name">${USER_LABEL[other]}</div>
+          <div class="compare-val">${otherData && otherData.kmThisWeek!==undefined ? otherData.kmThisWeek + ' km' : '—'}</div>
+          <div class="compare-sub">corridos esta semana</div>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -1630,6 +1701,18 @@ async function renderProgress(){
     weeklyBars.push({ label: `${start.getDate()}/${start.getMonth()+1}`, value: Math.round(count/7*100) });
   }
 
+  const kmSeries = await getKmSeries();
+  const weeklyKmBars = [];
+  for(let w=7; w>=0; w--){
+    const start = new Date(monday);
+    start.setDate(start.getDate() - w*7);
+    const startStr = start.toISOString().slice(0,10);
+    const end = new Date(start); end.setDate(end.getDate()+6);
+    const endStr = end.toISOString().slice(0,10);
+    const total = Math.round(sumKmInRange(kmSeries, startStr, endStr) * 10) / 10;
+    weeklyKmBars.push({ label: `${start.getDate()}/${start.getMonth()+1}`, value: total });
+  }
+
   let html = '';
 
   html += `
@@ -1643,7 +1726,14 @@ async function renderProgress(){
     <div class="prog-card">
       <div class="prog-title">Constancia semanal</div>
       <div class="prog-sub">% de días con sesión registrada, últimas 8 semanas</div>
-      ${svgBarChart(weeklyBars)}
+      ${svgBarChart(weeklyBars, {maxV:100})}
+    </div>`;
+
+  html += `
+    <div class="prog-card">
+      <div class="prog-title">Kilómetros corridos por semana</div>
+      <div class="prog-sub">Rumbo al trail del 4 de octubre</div>
+      ${svgBarChart(weeklyKmBars, {flat:true, showValue:true})}
     </div>`;
 
   html += await renderComparativaCard();
@@ -1720,7 +1810,7 @@ async function seedBorjaHistory(){
   await saveLog('2026-08-31', l31);
 
   const l01 = await loadLog('2026-09-01');
-  l01['p1_d1'] = { done:true };
+  l01['p1_d1'] = { done:true, km:'5', ritmo:'5:00-6:00' };
   l01['comment_p1_d1'] = '5 km entre 5 y 6 minutos el km. Muy pesado pero he recuperado rápido. Además he hecho press banca 55kg 40 reps, press sentado con barra 35kg 3x10, y estiramiento de cuádriceps sentado en el banco con unos 10kg, 4 reps.';
   await saveLog('2026-09-01', l01);
 
@@ -1788,7 +1878,10 @@ async function renderHistory(){
         } else if(key.startsWith('stretch_')){
           if(val && val.done) lines += `<div class="hist-line"><span>Estiramientos</span><span>✓</span></div>`;
         } else if(key.startsWith('p') && key.includes('_d')){
-          if(val && val.done) lines += `<div class="hist-line"><span>Sesión completada</span><span>✓</span></div>`;
+          if(val && val.done){
+            const kmTxt = val.km ? ` · ${val.km} km${val.ritmo ? ' · '+val.ritmo+' min/km' : ''}` : '';
+            lines += `<div class="hist-line"><span>Sesión completada${kmTxt}</span><span>✓</span></div>`;
+          }
         } else {
           if(val && (val.done || hasLoggedValue(val))){
             const valText = formatLogValue(fieldsForMode(exModeFromId(key)), val);
@@ -1841,7 +1934,10 @@ async function buildExportText(all){
       } else if(key.startsWith('stretch_')){
         if(val.done) out += `  Estiramientos: hechos\n`;
       } else if(key.startsWith('p') && key.includes('_d')){
-        if(val.done) out += `  Sesión marcada como completada\n`;
+        if(val.done){
+          const kmTxt = val.km ? ` (${val.km} km${val.ritmo ? ', '+val.ritmo+' min/km' : ''})` : '';
+          out += `  Sesión marcada como completada${kmTxt}\n`;
+        }
       } else {
         const valText = formatLogValue(fieldsForMode(exModeFromId(key)), val);
         out += `  ${exNameFromId(key, log)}: ${valText}${val.done?' (hecho)':''}\n`;
