@@ -248,6 +248,47 @@
   }
   .chart-delta{font-size:12px; margin-top:6px; text-align:center; color:var(--text2);}
 
+  .profile-picker{
+    position:fixed; inset:0; background:var(--bg); z-index:100;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:24px;
+  }
+  .profile-picker h2{font-size:19px; margin:0 0 4px;}
+  .profile-picker p{font-size:13px; color:var(--text2); margin:0 0 10px; text-align:center;}
+  .profile-btns{display:flex; gap:14px; width:100%; max-width:340px;}
+  .profile-btn{
+    flex:1; padding:22px 10px; border-radius:16px; border:0.5px solid var(--border);
+    background:var(--card); color:var(--text); font-size:15px; font-weight:700;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .profile-avatar{
+    width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:19px; font-weight:700; color:#0b0d12;
+  }
+  .avatar-borja{background:var(--accent);}
+  .avatar-tati{background:#e879b5;}
+
+  .user-switch{
+    position:absolute; top:20px; right:16px; font-size:11px; color:var(--text2);
+    background:var(--card2); border:0.5px solid var(--border); border-radius:8px; padding:5px 9px;
+  }
+
+  .race-card{
+    margin:12px 16px 0; background:linear-gradient(135deg, rgba(248,113,113,0.14), var(--card));
+    border:0.5px solid var(--red); border-radius:14px; padding:12px 14px; box-shadow:var(--shadow);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .race-left{display:flex; flex-direction:column;}
+  .race-title{font-size:12.5px; font-weight:700; color:#fca5a5;}
+  .race-sub{font-size:11px; color:var(--text2); margin-top:1px;}
+  .race-days{font-size:22px; font-weight:800; color:#fca5a5; line-height:1;}
+  .race-days-label{font-size:9.5px; color:var(--text2); text-align:center; text-transform:uppercase;}
+
+  .compare-row{display:flex; gap:10px; margin-top:6px;}
+  .compare-col{flex:1; background:var(--card2); border-radius:10px; padding:10px; text-align:center;}
+  .compare-name{font-size:11.5px; color:var(--text2); margin-bottom:4px; font-weight:600;}
+  .compare-val{font-size:18px; font-weight:700;}
+  .compare-sub{font-size:10.5px; color:var(--muted); margin-top:2px;}
+
   .nutri-card{
     margin:12px 16px 0; background:var(--card); border:0.5px solid var(--border); border-radius:14px;
     padding:13px 14px; box-shadow:var(--shadow);
@@ -278,11 +319,30 @@
 </head>
 <body>
 
+<div class="profile-picker" id="profilePicker">
+  <h2>¿Quién entrena hoy?</h2>
+  <p>Cada uno ve solo su propio plan y su propio progreso.</p>
+  <div class="profile-btns">
+    <button class="profile-btn" data-user="borja">
+      <span class="profile-avatar avatar-borja">B</span>
+      Borja
+    </button>
+    <button class="profile-btn" data-user="tati">
+      <span class="profile-avatar avatar-tati">T</span>
+      Tati
+    </button>
+  </div>
+</div>
+
+<button class="user-switch" id="userSwitchBtn" style="display:none;">Cambiar ↺</button>
+
 <header>
   <h1>Plan de entrenamiento</h1>
   <p class="sub" id="subtitle">Fuerza + carrera + base CrossFit</p>
   <div class="streak-pill" id="streakPill" style="display:none;"></div>
 </header>
+
+<div class="race-card" id="raceCard"></div>
 
 <div class="summary-row" id="summaryRow"></div>
 
@@ -378,7 +438,7 @@ if('serviceWorker' in navigator){
   });
 }
 
-const PLAN = {
+const PLANS = { borja: {
   1: {
     label: "Fase 1 · Reacondicionamiento",
     days: [
@@ -458,8 +518,154 @@ const PLAN = {
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
     ]
   }
+},
+tati: {
+  1: {
+    label: "Fase 1 · Reacondicionamiento",
+    days: [
+      { day:"Lunes", name:"Fuerza A (Full body + glúteo)", dur:"45-50 min", focus:"Técnica + volumen moderado",
+        exercises:[
+          {id:"f1t_lu_1", name:"Sentadilla trasera", target:"3×8 @ RPE 6"},
+          {id:"f1t_lu_2", name:"Hip thrust", target:"3×12"},
+          {id:"f1t_lu_3", name:"Remo con barra", target:"3×10"},
+          {id:"f1t_lu_4", name:"Peso muerto rumano", target:"2×10"},
+          {id:"f1t_lu_5", name:"Patada de glúteo en polea", target:"3×12/pierna", mode:"unilateral"},
+          {id:"f1t_lu_6", name:"Plancha", target:"3×30-40s", mode:"time"},
+        ]},
+      { day:"Martes", name:"Carrera suave", dur:"25-35 min", focus:"Ritmo cómodo, sin agobios", simple:true },
+      { day:"Miércoles", name:"Fuerza B (Full body + glúteo)", dur:"45-50 min", focus:"Técnica + volumen moderado",
+        exercises:[
+          {id:"f1t_mi_1", name:"Peso muerto convencional", target:"3×6 @ RPE 6"},
+          {id:"f1t_mi_2", name:"Zancadas con mancuerna", target:"2×10/pierna", mode:"unilateral"},
+          {id:"f1t_mi_3", name:"Dominadas asistidas / remo polea", target:"3×8-10"},
+          {id:"f1t_mi_4", name:"Puente de glúteo a una pierna", target:"3×12/pierna", mode:"unilateral"},
+          {id:"f1t_mi_5", name:"Kettlebell swing", target:"3×15"},
+        ]},
+      { day:"Jueves", name:"Carrera suave + core", dur:"25-30 min", focus:"Ritmo cómodo + 10 min core", simple:true },
+      { day:"Viernes", name:"Fuerza C (Full body + glúteo)", dur:"45-50 min", focus:"Técnica + volumen moderado",
+        exercises:[
+          {id:"f1t_vi_1", name:"Sentadilla frontal / goblet", target:"3×8"},
+          {id:"f1t_vi_2", name:"Press inclinado mancuernas", target:"3×10"},
+          {id:"f1t_vi_3", name:"Face pull en polea", target:"3×15"},
+          {id:"f1t_vi_4", name:"Zancadas búlgaras", target:"3×8/pierna", mode:"unilateral"},
+          {id:"f1t_vi_5", name:"Farmer carry", target:"3×30m", mode:"carry"},
+        ]},
+      { day:"Sábado", name:"Carrera larga suave", dur:"35-50 min", focus:"Ritmo cómodo, sin reloj de ritmo", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad + remo/bici muy suave", simple:true },
+    ]
+  },
+  2: {
+    label: "Fase 2 · Construcción",
+    days: [
+      { day:"Lunes", name:"Fuerza A (Pierna/glúteo)", dur:"50-55 min", focus:"Fuerza, RPE 7",
+        exercises:[
+          {id:"f2t_lu_1", name:"Sentadilla trasera", target:"RPE 7, subir carga"},
+          {id:"f2t_lu_2", name:"Hip thrust", target:"3×12"},
+          {id:"f2t_lu_3", name:"Press militar", target:"3×8"},
+          {id:"f2t_lu_4", name:"Zancadas", target:"3×10/pierna", mode:"unilateral"},
+        ]},
+      { day:"Martes", name:"Carrera calidad suave", dur:"30-35 min", focus:"Progresiones cortas, sin ir al límite", simple:true },
+      { day:"Miércoles", name:"Fuerza B (Tirón/glúteo)", dur:"50-55 min", focus:"Fuerza, RPE 7",
+        exercises:[
+          {id:"f2t_mi_1", name:"Peso muerto convencional", target:"RPE 7"},
+          {id:"f2t_mi_2", name:"Dominadas / remo polea", target:"3×8-10"},
+          {id:"f2t_mi_3", name:"Puente de glúteo a una pierna", target:"3×12/pierna", mode:"unilateral"},
+          {id:"f2t_mi_4", name:"Face pull", target:"3×15"},
+        ]},
+      { day:"Jueves", name:"Carrera suave + core", dur:"25-30 min", focus:"Ritmo cómodo", simple:true },
+      { day:"Viernes", name:"Full body / metcon corto (pierna/glúteo)", dur:"35-40 min", focus:"AMRAP 12-15 min: KB swing, hip thrust, air squat, remo", simple:true },
+      { day:"Sábado", name:"Carrera larga", dur:"40-60 min", focus:"Ritmo cómodo, subiendo volumen hacia el trail", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
+    ]
+  },
+  3: {
+    label: "Fase 3 · Puesta a punto (trail 12K)",
+    days: [
+      { day:"Lunes", name:"Fuerza pesada (pierna/glúteo)", dur:"45-55 min", focus:"RPE 8, bajo volumen alta carga",
+        exercises:[
+          {id:"f3t_lu_1", name:"Sentadilla trasera", target:"RPE 8"},
+          {id:"f3t_lu_2", name:"Hip thrust cargado", target:"3×8"},
+          {id:"f3t_lu_3", name:"Zancadas búlgaras", target:"3×8/pierna", mode:"unilateral"},
+        ]},
+      { day:"Martes", name:"Carrera calidad (ritmo objetivo trail)", dur:"30-35 min", focus:"Ritmo cercano al de carrera", simple:true },
+      { day:"Miércoles", name:"Fuerza mantenimiento (torso)", dur:"40-50 min", focus:"RPE 7, mantener sin acumular fatiga",
+        exercises:[
+          {id:"f3t_mi_1", name:"Press banca", target:"RPE 7"},
+          {id:"f3t_mi_2", name:"Dominadas", target:"3×6-8"},
+          {id:"f3t_mi_3", name:"Press militar", target:"3×8"},
+        ]},
+      { day:"Jueves", name:"Carrera suave + core", dur:"25-30 min", focus:"Ritmo cómodo", simple:true },
+      { day:"Viernes", name:"Movilidad + activación", dur:"25-30 min", focus:"Pre carrera larga, nada de fatiga", simple:true },
+      { day:"Sábado", name:"Carrera larga específica", dur:"50-75 min", focus:"Simula terreno/desnivel del trail si es posible", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
+    ]
+  }
+}
 };
 
+const RACE_DATE = '2026-10-04';
+const RACE_TARGET = { borja: '21 km', tati: '12 km' };
+const USER_LABEL = { borja: 'Borja', tati: 'Tati' };
+
+let currentUser = null;
+
+function uk(key){ return currentUser + ':' + key; }
+function plan(){ return PLANS[currentUser]; }
+
+function renderRaceCard(){
+  const card = document.getElementById('raceCard');
+  const today = new Date(todayStr()+'T00:00:00');
+  const race = new Date(RACE_DATE+'T00:00:00');
+  const diffDays = Math.round((race - today) / 86400000);
+  const label = USER_LABEL[currentUser];
+  const target = RACE_TARGET[currentUser];
+  if(diffDays < 0){
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'flex';
+  card.innerHTML = `
+    <div class="race-left">
+      <div class="race-title">🏔️ Trail — ${target}</div>
+      <div class="race-sub">${label} · 4 de octubre de 2026</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="race-days">${diffDays}</div>
+      <div class="race-days-label">días</div>
+    </div>`;
+}
+
+function initProfile(){
+  const saved = localStorage.getItem('activeUser');
+  const picker = document.getElementById('profilePicker');
+  const switchBtn = document.getElementById('userSwitchBtn');
+
+  function chooseUser(u){
+    currentUser = u;
+    localStorage.setItem('activeUser', u);
+    picker.style.display = 'none';
+    switchBtn.style.display = 'block';
+    startApp();
+  }
+
+  document.querySelectorAll('.profile-btn').forEach(btn=>{
+    btn.onclick = ()=> chooseUser(btn.dataset.user);
+  });
+
+  switchBtn.onclick = ()=>{
+    localStorage.removeItem('activeUser');
+    location.reload();
+  };
+
+  if(saved && PLANS[saved]){
+    currentUser = saved;
+    picker.style.display = 'none';
+    switchBtn.style.display = 'block';
+    startApp();
+  } else {
+    picker.style.display = 'flex';
+  }
+}
 const STRETCHES = {
   fuerza: [
     { name:'Cuádriceps de pie', detail:'30s cada pierna' },
@@ -494,7 +700,7 @@ async function renderNutriCard(){
   const dateKey = currentDate;
   let nutri = {};
   try{
-    const res = await window.storage.get('nutri:' + dateKey);
+    const res = await window.storage.get(uk('nutri:' + dateKey));
     nutri = res ? JSON.parse(res.value) : {};
   }catch(e){}
 
@@ -538,11 +744,11 @@ async function renderNutriCard(){
       const key = el.dataset.nkey;
       let n = {};
       try{
-        const res = await window.storage.get('nutri:' + dateKey);
+        const res = await window.storage.get(uk('nutri:' + dateKey));
         n = res ? JSON.parse(res.value) : {};
       }catch(e){}
       n[key] = el.classList.contains('done');
-      await window.storage.set('nutri:' + dateKey, JSON.stringify(n));
+      await window.storage.set(uk('nutri:' + dateKey), JSON.stringify(n));
     };
   });
 }
@@ -589,7 +795,7 @@ function goToday(){
 
 async function loadLog(dateKey){
   try{
-    const res = await window.storage.get('log:' + dateKey);
+    const res = await window.storage.get(uk('log:' + dateKey));
     return res ? JSON.parse(res.value) : {};
   }catch(e){
     return {};
@@ -598,7 +804,7 @@ async function loadLog(dateKey){
 
 async function saveLog(dateKey, data){
   try{
-    await window.storage.set('log:' + dateKey, JSON.stringify(data));
+    await window.storage.set(uk('log:' + dateKey), JSON.stringify(data));
   }catch(e){
     console.error('storage error', e);
   }
@@ -614,7 +820,7 @@ function buildPhaseRow(){
     b.onclick = ()=>{ currentPhase = p; buildPhaseRow(); renderWeek(); };
     row.appendChild(b);
   });
-  document.getElementById('subtitle').textContent = PLAN[currentPhase].label;
+  document.getElementById('subtitle').textContent = plan()[currentPhase].label;
 }
 
 function weekdayIndexFromDate(dateStr){
@@ -730,9 +936,10 @@ async function renderSummary(){
 async function renderWeek(){
   await renderSummary();
   await renderNutriCard();
+  renderRaceCard();
   const container = document.getElementById('weekList');
   container.innerHTML = '';
-  const days = PLAN[currentPhase].days;
+  const days = plan()[currentPhase].days;
   const todayIdx = weekdayIndexFromDate(currentDate);
 
   for(let i=0;i<days.length;i++){
@@ -848,7 +1055,7 @@ async function renderDayBody(d, idx){
       </button>
       <div class="comment-box">
         <label>Comentario / sensaciones</label>
-        <textarea id="comment_${idx}" placeholder="Ritmo, sensación, molestias...">${commentVal}</textarea>
+        <textarea id="comment_${idx}" placeholder="Ritmo, sensación, molestias... o si has aprovechado para meter algo extra (fuerza, estiramientos, lo que sea)">${commentVal}</textarea>
       </div>
       <div class="save-row"><button class="save-btn" id="saveBtn_${idx}">Guardar</button><div class="saved-note" id="savedNote_${idx}">Guardado</div></div>
       ${stretchSectionHtml(d, idx, stretchDone)}
@@ -993,9 +1200,10 @@ async function renderDayBody(d, idx){
 
 async function getLastExerciseLog(exId, beforeDateKey){
   try{
-    const list = await window.storage.list('log:');
+    const prefix = uk('log:');
+    const list = await window.storage.list(prefix);
     if(!list || !list.keys) return null;
-    const keys = list.keys.map(k=> k.startsWith('log:')?k:'log:'+k).filter(k=> k.replace('log:','') < beforeDateKey).sort().reverse();
+    const keys = list.keys.map(k=> k.startsWith(prefix)?k:prefix+k).filter(k=> k.replace(prefix,'') < beforeDateKey).sort().reverse();
     for(const k of keys.slice(0,30)){
       try{
         const res = await window.storage.get(k);
@@ -1017,13 +1225,14 @@ async function getLastExerciseNote(exId, beforeDateKey, mode){
 
 async function getBestExerciseValue(exId, beforeDateKey, mode){
   try{
-    const list = await window.storage.list('log:');
+    const prefix = uk('log:');
+    const list = await window.storage.list(prefix);
     if(!list || !list.keys) return null;
     const field = primaryFieldForMode(mode);
     let best = null;
     for(const k of list.keys){
-      const fullKey = k.startsWith('log:') ? k : 'log:' + k;
-      const dateKey = fullKey.replace('log:','');
+      const fullKey = k.startsWith(prefix) ? k : prefix + k;
+      const dateKey = fullKey.replace(prefix,'');
       if(dateKey >= beforeDateKey) continue;
       try{
         const res = await window.storage.get(fullKey);
@@ -1043,7 +1252,7 @@ async function updateBadge(idx){
   const badge = document.getElementById(`badge_${currentPhase}_${idx}`);
   const nameEl = document.getElementById(`dayname_${idx}`);
   if(!badge) return;
-  const d = PLAN[currentPhase].days[idx];
+  const d = plan()[currentPhase].days[idx];
   const done = await dayIsDone(currentDate, currentPhase, idx, d);
   badge.classList.toggle('done', done);
   badge.textContent = done ? '✓' : '';
@@ -1197,13 +1406,14 @@ function svgBarChart(bars){
 }
 
 async function collectAllLogs(){
-  const list = await window.storage.list('log:');
+  const prefix = uk('log:');
+  const list = await window.storage.list(prefix);
   const results = [];
   if(!list || !list.keys) return results;
   const keys = [...list.keys].sort().reverse();
   for(const k of keys){
-    const fullKey = k.startsWith('log:') ? k : 'log:' + k;
-    const dateKey = fullKey.replace('log:','');
+    const fullKey = k.startsWith(prefix) ? k : prefix + k;
+    const dateKey = fullKey.replace(prefix,'');
     try{
       const res = await window.storage.get(fullKey);
       if(!res) continue;
@@ -1217,7 +1427,7 @@ async function collectAllLogs(){
 }
 
 function exModeFromId(id){
-  for(const phase of Object.values(PLAN)){
+  for(const phase of Object.values(plan())){
     for(const day of phase.days){
       if(day.exercises){
         const found = day.exercises.find(e=>e.id===id);
@@ -1237,7 +1447,7 @@ function exNameFromId(id, log){
       }
     }
   }
-  for(const phase of Object.values(PLAN)){
+  for(const phase of Object.values(plan())){
     for(const day of phase.days){
       if(day.exercises){
         const found = day.exercises.find(e=>e.id===id);
@@ -1273,6 +1483,59 @@ async function buildExerciseSeries(){
 function formatDateShort(dateStr){
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('es-ES', { day:'numeric', month:'short' });
+}
+
+async function renderComparativaCard(){
+  let data = null;
+  try{
+    const res = await fetch('./comparativa.json', { cache:'no-store' });
+    if(res.ok) data = await res.json();
+  }catch(e){}
+
+  const myStreak = await currentStreak();
+  const monday = mondayOfWeek(todayStr());
+  let myDays = 0;
+  for(let i=0;i<7;i++){
+    const d = new Date(monday); d.setDate(d.getDate()+i);
+    const dk = d.toISOString().slice(0,10);
+    if(dk<=todayStr() && await dayHasActivity(dk)) myDays++;
+  }
+
+  const other = currentUser==='borja' ? 'tati' : 'borja';
+  const otherData = data && data[other] ? data[other] : null;
+  const updatedNote = data && data.updated
+    ? `Datos de ${USER_LABEL[other]} actualizados a partir de vuestra última exportación (${data.updated})`
+    : `Aún no hay datos de ${USER_LABEL[other]} — en cuanto exporte su historial y me lo paséis, lo actualizo aquí.`;
+
+  return `
+    <div class="prog-card">
+      <div class="prog-title">🆚 ${USER_LABEL[currentUser]} vs ${USER_LABEL[other]}</div>
+      <div class="prog-sub">${updatedNote}</div>
+      <div class="compare-row">
+        <div class="compare-col">
+          <div class="compare-name">${USER_LABEL[currentUser]} (tú)</div>
+          <div class="compare-val">${myStreak}</div>
+          <div class="compare-sub">racha (días)</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-name">${USER_LABEL[other]}</div>
+          <div class="compare-val">${otherData ? otherData.streak : '—'}</div>
+          <div class="compare-sub">racha (días)</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-col">
+          <div class="compare-name">${USER_LABEL[currentUser]} (tú)</div>
+          <div class="compare-val">${myDays}/7</div>
+          <div class="compare-sub">esta semana</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-name">${USER_LABEL[other]}</div>
+          <div class="compare-val">${otherData ? otherData.daysThisWeek + '/7' : '—'}</div>
+          <div class="compare-sub">esta semana</div>
+        </div>
+      </div>
+    </div>`;
 }
 
 async function renderProgress(){
@@ -1319,6 +1582,8 @@ async function renderProgress(){
       ${svgBarChart(weeklyBars)}
     </div>`;
 
+  html += await renderComparativaCard();
+
   if(names.length>0){
     const options = names.map(n=> `<option value="${n}" ${n===progSelectedName?'selected':''}>${n}</option>`).join('');
     const series = exSeries[progSelectedName];
@@ -1353,13 +1618,14 @@ async function renderProgress(){
 
 async function getAllWeights(){
   try{
-    const list = await window.storage.list('weight:');
+    const prefix = uk('weight:');
+    const list = await window.storage.list(prefix);
     if(!list || !list.keys) return [];
     const keys = [...list.keys].sort().reverse();
     const out = [];
     for(const k of keys){
-      const fullKey = k.startsWith('weight:') ? k : 'weight:' + k;
-      const dateKey = fullKey.replace('weight:','');
+      const fullKey = k.startsWith(prefix) ? k : prefix + k;
+      const dateKey = fullKey.replace(prefix,'');
       try{
         const res = await window.storage.get(fullKey);
         if(res) out.push({ dateKey, kg: res.value });
@@ -1371,35 +1637,30 @@ async function getAllWeights(){
   }
 }
 
-async function seedInitialWeight(){
-  try{
-    const seedDate = daysAgoStr(1);
-    const existing = await window.storage.get('weight:' + seedDate).catch(()=>null);
-    if(!existing){
-      await window.storage.set('weight:' + seedDate, '94.5');
-    }
-  }catch(e){}
-}
-
-async function seedTodaySession(){
-  const flagKey = 'seeded_20260831_v1';
-  const already = await window.storage.get(flagKey);
+async function seedBorjaHistory(){
+  if(currentUser !== 'borja') return;
+  const flagKey = 'seeded_history_v2';
+  const already = await window.storage.get(uk(flagKey));
   if(already) return;
-  const dateKey = '2026-08-31';
-  const l = await loadLog(dateKey);
-  if(!l['f1_lu_1']) l['f1_lu_1'] = { done:false, peso:'20', reps:'30' };
-  if(!l['f1_lu_2']) l['f1_lu_2'] = { done:true, peso:'55', reps:'40' };
-  if(!l['f1_lu_3']) l['f1_lu_3'] = { done:false, peso:'35', reps:'30' };
-  if(!l['f1_lu_4']) l['f1_lu_4'] = { done:true, peso:'10', reps:'60' };
-  if(!l['f1_lu_5']) l['f1_lu_5'] = { done:false, segundos:'90' };
-  const commentKey = 'comment_p1_d0';
-  const runNote = 'Trote por montaña: 2 km a ritmo 5:20/km';
-  const existingComment = l[commentKey] || '';
-  if(!existingComment.includes(runNote)){
-    l[commentKey] = existingComment ? existingComment + ' | ' + runNote : runNote;
-  }
-  await saveLog(dateKey, l);
-  await window.storage.set(flagKey, '1');
+
+  await window.storage.set(uk('weight:2026-08-30'), '94.5');
+  await window.storage.set(uk('weight:2026-08-31'), '93.8');
+
+  const l31 = await loadLog('2026-08-31');
+  l31['f1_lu_1'] = { done:true, peso:'20', reps:'30' };
+  l31['f1_lu_2'] = { done:true, peso:'55', reps:'40' };
+  l31['f1_lu_3'] = { done:true, peso:'35', reps:'30' };
+  l31['f1_lu_4'] = { done:true, peso:'10', reps:'60' };
+  l31['f1_lu_5'] = { done:true, segundos:'90' };
+  l31['comment_p1_d0'] = 'Trote por montaña: 2 km a ritmo 5:20/km';
+  await saveLog('2026-08-31', l31);
+
+  const l01 = await loadLog('2026-09-01');
+  l01['p1_d1'] = { done:true };
+  l01['comment_p1_d1'] = '5 km entre 5 y 6 minutos el km. Muy pesado pero he recuperado rápido. Además he hecho press banca 55kg 40 reps, press sentado con barra 35kg 3x10, y estiramiento de cuádriceps sentado en el banco con unos 10kg, 4 reps.';
+  await saveLog('2026-09-01', l01);
+
+  await window.storage.set(uk(flagKey), '1');
 }
 
 async function renderWeightView(){
@@ -1433,7 +1694,7 @@ document.getElementById('weightSaveBtn').onclick = async ()=>{
   const date = document.getElementById('weightDate').value;
   const kg = document.getElementById('weightKg').value;
   if(!date || !kg) return;
-  await window.storage.set('weight:' + date, kg);
+  await window.storage.set(uk('weight:' + date), kg);
   document.getElementById('weightKg').value = '';
   renderWeightView();
   renderSummary();
@@ -1581,12 +1842,13 @@ document.getElementById('datePicker').addEventListener('change', (e)=>{
   renderWeek();
 });
 
-(async function init(){
-  await seedInitialWeight();
-  await seedTodaySession();
+async function startApp(){
+  await seedBorjaHistory();
   buildPhaseRow();
   goToday();
-})();
+}
+
+initProfile();
 </script>
 
 </body>
