@@ -247,6 +247,33 @@
     color:var(--text); font-size:13px; padding:9px 10px; margin-bottom:10px;
   }
   .chart-delta{font-size:12px; margin-top:6px; text-align:center; color:var(--text2);}
+
+  .nutri-card{
+    margin:12px 16px 0; background:var(--card); border:0.5px solid var(--border); border-radius:14px;
+    padding:13px 14px; box-shadow:var(--shadow);
+  }
+  .nutri-title{font-size:13px; font-weight:700; margin-bottom:2px; display:flex; align-items:center; gap:6px;}
+  .nutri-sub{font-size:11.5px; color:var(--text2); margin-bottom:10px;}
+  .nutri-row{
+    display:flex; align-items:center; gap:10px; padding:8px 0; border-top:0.5px solid var(--border);
+  }
+  .nutri-row:first-of-type{border-top:none;}
+  .nutri-check{
+    width:22px; height:22px; border-radius:7px; border:1.5px solid var(--border); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--muted);
+  }
+  .nutri-check.done{background:var(--green); border-color:var(--green); color:#08301a;}
+  .nutri-label{font-size:13px; font-weight:500;}
+  .nutri-detail{font-size:11.5px; color:var(--text2); margin-top:1px;}
+
+  .stretch-section{margin-top:14px; padding-top:12px; border-top:0.5px dashed var(--border);}
+  .stretch-title{font-size:12.5px; font-weight:700; color:var(--text2); margin-bottom:8px; display:flex; align-items:center; gap:6px;}
+  .stretch-list{list-style:none; margin:0 0 10px; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .stretch-list li{
+    font-size:12.5px; color:var(--text2); display:flex; justify-content:space-between; gap:8px;
+    background:var(--card2); border-radius:8px; padding:7px 10px;
+  }
+  .stretch-list li b{color:var(--text); font-weight:500;}
 </style>
 </head>
 <body>
@@ -258,6 +285,8 @@
 </header>
 
 <div class="summary-row" id="summaryRow"></div>
+
+<div class="nutri-card" id="nutriCard"></div>
 
 <div id="planTabContent">
   <div class="date-picker-row">
@@ -431,6 +460,115 @@ const PLAN = {
   }
 };
 
+const STRETCHES = {
+  fuerza: [
+    { name:'Cuádriceps de pie', detail:'30s cada pierna' },
+    { name:'Isquiotibiales sentado', detail:'30s cada pierna' },
+    { name:'Pectoral en marco de puerta', detail:'30s cada lado' },
+    { name:'Dorsal ancho', detail:'30s, estiramiento lateral' },
+    { name:'Flexores de cadera', detail:'30s cada lado, zancada' },
+  ],
+  carrera: [
+    { name:'Gemelo y sóleo contra pared', detail:'30s cada pierna' },
+    { name:'Isquiotibiales', detail:'30s cada pierna' },
+    { name:'Flexores de cadera', detail:'30s cada lado' },
+    { name:'Glúteo (figura 4)', detail:'30s cada lado' },
+    { name:'Cuádriceps de pie', detail:'30s cada pierna' },
+  ],
+  recuperacion: [
+    { name:'Gato-camello', detail:'10 repeticiones lentas' },
+    { name:'Rotación torácica', detail:'8 por lado, en cuadrupedia' },
+    { name:'Apertura de cadera 90/90', detail:'30s cada lado' },
+    { name:'Foam roller (si tienes)', detail:'2 min piernas + espalda' },
+  ],
+  wod: [
+    { name:'Cuádriceps de pie', detail:'20s cada pierna' },
+    { name:'Isquiotibiales', detail:'20s cada pierna' },
+    { name:'Hombro cruzado', detail:'20s cada lado' },
+    { name:'Flexores de cadera', detail:'20s cada lado' },
+  ],
+};
+
+async function renderNutriCard(){
+  const card = document.getElementById('nutriCard');
+  const dateKey = currentDate;
+  let nutri = {};
+  try{
+    const res = await window.storage.get('nutri:' + dateKey);
+    nutri = res ? JSON.parse(res.value) : {};
+  }catch(e){}
+
+  const weights = await getAllWeights();
+  let proteinLine = 'Objetivo orientativo: 1,6–2,2 g/kg de peso corporal al día.';
+  if(weights.length>0){
+    const kg = parseFloat(weights[0].kg);
+    if(!isNaN(kg)){
+      const low = Math.round(kg*1.6), high = Math.round(kg*2.2);
+      proteinLine = `[estimación] Con ${kg}kg, tu rango orientativo serían ${low}–${high} g/día de proteína.`;
+    }
+  }
+
+  const items = [
+    { key:'creatina', label:'Creatina', detail:'3-5g, cualquier momento del día (dosis de mantenimiento habitual)' },
+    { key:'proteina', label:'Proteína', detail: proteinLine },
+    { key:'agua', label:'Hidratación', detail:'Especialmente en días de carrera o calor' },
+  ];
+
+  const rows = items.map(it=>{
+    const done = !!nutri[it.key];
+    return `
+      <div class="nutri-row">
+        <div class="nutri-check ${done?'done':''}" data-nkey="${it.key}">${done?'✓':''}</div>
+        <div>
+          <div class="nutri-label">${it.label}</div>
+          <div class="nutri-detail">${it.detail}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="nutri-title">🍽️ Hoy</div>
+    <div class="nutri-sub">Pautas generales, no sustituyen el consejo de un profesional</div>
+    ${rows}`;
+
+  card.querySelectorAll('.nutri-check').forEach(el=>{
+    el.onclick = async ()=>{
+      el.classList.toggle('done');
+      el.textContent = el.classList.contains('done') ? '✓' : '';
+      const key = el.dataset.nkey;
+      let n = {};
+      try{
+        const res = await window.storage.get('nutri:' + dateKey);
+        n = res ? JSON.parse(res.value) : {};
+      }catch(e){}
+      n[key] = el.classList.contains('done');
+      await window.storage.set('nutri:' + dateKey, JSON.stringify(n));
+    };
+  });
+}
+
+function stretchSectionHtml(d, idx, done){
+  const key = stretchKeyFor(d);
+  const list = STRETCHES[key];
+  const items = list.map(s=> `<li><b>${s.name}</b><span>${s.detail}</span></li>`).join('');
+  return `
+    <div class="stretch-section">
+      <div class="stretch-title">🤸 Estiramientos recomendados</div>
+      <ul class="stretch-list">${items}</ul>
+      <button class="simple-toggle ${done?'done':''}" id="stretchBtn_${idx}">
+        ${done ? '✓ Estiramientos hechos' : 'Marcar estiramientos como hechos'}
+      </button>
+    </div>`;
+}
+
+function stretchKeyFor(d){
+  const cls = dayTypeClass(d);
+  if(cls==='type-recuperacion') return 'recuperacion';
+  if(cls==='type-wod') return 'wod';
+  if(cls==='type-carrera') return 'carrera';
+  return 'fuerza';
+}
+
 let currentPhase = 1;
 let currentDate = new Date().toISOString().slice(0,10);
 let calYear, calMonth;
@@ -591,6 +729,7 @@ async function renderSummary(){
 
 async function renderWeek(){
   await renderSummary();
+  await renderNutriCard();
   const container = document.getElementById('weekList');
   container.innerHTML = '';
   const days = PLAN[currentPhase].days;
@@ -701,6 +840,8 @@ async function renderDayBody(d, idx){
 
   if(d.simple){
     const done = !!(log[dayLogKey] && log[dayLogKey].done);
+    const stretchKey = `stretch_${dayLogKey}`;
+    const stretchDone = !!(log[stretchKey] && log[stretchKey].done);
     body.innerHTML = `
       <button class="simple-toggle ${done?'done':''}" id="simpleBtn_${idx}">
         ${done ? '✓ Sesión completada' : 'Marcar como hecha'}
@@ -710,7 +851,12 @@ async function renderDayBody(d, idx){
         <textarea id="comment_${idx}" placeholder="Ritmo, sensación, molestias...">${commentVal}</textarea>
       </div>
       <div class="save-row"><button class="save-btn" id="saveBtn_${idx}">Guardar</button><div class="saved-note" id="savedNote_${idx}">Guardado</div></div>
+      ${stretchSectionHtml(d, idx, stretchDone)}
     `;
+    document.getElementById(`stretchBtn_${idx}`).onclick = (e)=>{
+      e.target.classList.toggle('done');
+      e.target.textContent = e.target.classList.contains('done') ? '✓ Estiramientos hechos' : 'Marcar estiramientos como hechos';
+    };
     document.getElementById(`simpleBtn_${idx}`).onclick = (e)=>{
       e.target.classList.toggle('done');
       e.target.textContent = e.target.classList.contains('done') ? '✓ Sesión completada' : 'Marcar como hecha';
@@ -718,7 +864,9 @@ async function renderDayBody(d, idx){
     document.getElementById(`saveBtn_${idx}`).onclick = async ()=>{
       const l = await loadLog(dateKey);
       const btn = document.getElementById(`simpleBtn_${idx}`);
+      const sBtn = document.getElementById(`stretchBtn_${idx}`);
       l[dayLogKey] = { done: btn.classList.contains('done') };
+      l[stretchKey] = { done: sBtn.classList.contains('done') };
       l[commentKey] = document.getElementById(`comment_${idx}`).value;
       await saveLog(dateKey, l);
       const note = document.getElementById(`savedNote_${idx}`);
@@ -746,7 +894,15 @@ async function renderDayBody(d, idx){
         <textarea id="comment_${idx}" placeholder="RPE general, molestias, cómo te sentiste...">${commentVal}</textarea>
       </div>`;
     html += `<div class="save-row"><button class="save-btn" id="saveBtn_${idx}">Guardar</button><div class="saved-note" id="savedNote_${idx}">Guardado</div></div>`;
+    const stretchKeyF = `stretch_${dayLogKey}`;
+    const stretchDoneF = !!(log[stretchKeyF] && log[stretchKeyF].done);
+    html += stretchSectionHtml(d, idx, stretchDoneF);
     body.innerHTML = html;
+
+    document.getElementById(`stretchBtn_${idx}`).onclick = (e)=>{
+      e.target.classList.toggle('done');
+      e.target.textContent = e.target.classList.contains('done') ? '✓ Estiramientos hechos' : 'Marcar estiramientos como hechos';
+    };
 
     body.querySelectorAll('.ex-check').forEach(el=>{
       el.onclick = ()=>{
@@ -820,6 +976,8 @@ async function renderDayBody(d, idx){
       }
       l[commentKey] = document.getElementById(`comment_${idx}`).value;
       l[customListKey] = customList;
+      const stretchBtnEl = document.getElementById(`stretchBtn_${idx}`);
+      if(stretchBtnEl) l[`stretch_${dayLogKey}`] = { done: stretchBtnEl.classList.contains('done') };
       await saveLog(dateKey, l);
       const note = document.getElementById(`savedNote_${idx}`);
       note.textContent = prHits.length ? `🏆 ¡Nuevo PR en ${prHits.join(', ')}!` : 'Guardado';
@@ -1302,6 +1460,8 @@ async function renderHistory(){
         if(key.startsWith('customlist_')) return;
         if(key.startsWith('comment_')){
           if(val && val.trim()) lines += `<div class="hist-line"><span style="font-style:italic;">"${val}"</span><span></span></div>`;
+        } else if(key.startsWith('stretch_')){
+          if(val && val.done) lines += `<div class="hist-line"><span>Estiramientos</span><span>✓</span></div>`;
         } else if(key.startsWith('p') && key.includes('_d')){
           if(val && val.done) lines += `<div class="hist-line"><span>Sesión completada</span><span>✓</span></div>`;
         } else {
@@ -1353,6 +1513,8 @@ async function buildExportText(all){
       if(key.startsWith('customlist_')) return;
       if(key.startsWith('comment_')){
         if(val && val.trim()) out += `  Comentario: ${val}\n`;
+      } else if(key.startsWith('stretch_')){
+        if(val.done) out += `  Estiramientos: hechos\n`;
       } else if(key.startsWith('p') && key.includes('_d')){
         if(val.done) out += `  Sesión marcada como completada\n`;
       } else {
