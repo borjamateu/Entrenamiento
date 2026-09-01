@@ -1,5 +1,5 @@
 {
   "updated": "2026-09-01",
-  "borja": { "streak": 2, "daysThisWeek": 2 },
-  "tati": { "streak": 0, "daysThisWeek": 0 }
+  "borja": { "streak": 2, "daysThisWeek": 2, "kmThisWeek": 5 },
+  "tati": { "streak": 0, "daysThisWeek": 0, "kmThisWeek": 0 }
 }
