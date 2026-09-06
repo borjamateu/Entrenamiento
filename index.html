@@ -352,6 +352,10 @@
 
 <button class="user-switch" id="userSwitchBtn" style="display:none;">Cambiar ↺</button>
 
+<div id="globalErrorBanner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:200; background:var(--red); color:#2a0a0a; font-size:12.5px; font-weight:700; text-align:center; padding:10px 14px;">
+  ⚠️ Algo ha fallado. Prueba a recargar la app (cerrarla y volver a abrirla).
+</div>
+
 <header>
   <h1>Plan de entrenamiento</h1>
   <p class="sub" id="subtitle">Fuerza + carrera + base CrossFit</p>
@@ -412,6 +416,21 @@
 </div>
 
 <script>
+window.addEventListener('error', ()=>{
+  const banner = document.getElementById('globalErrorBanner');
+  if(banner){
+    banner.style.display = 'block';
+    setTimeout(()=>{ banner.style.display = 'none'; }, 6000);
+  }
+});
+window.addEventListener('unhandledrejection', ()=>{
+  const banner = document.getElementById('globalErrorBanner');
+  if(banner){
+    banner.style.display = 'block';
+    setTimeout(()=>{ banner.style.display = 'none'; }, 6000);
+  }
+});
+
 /* ---------- CAPA DE ALMACENAMIENTO ----------
    Esta app vive en GitHub Pages (fuera del entorno de artifacts de Claude),
    así que usa localStorage real del navegador. Si en algún momento se abre
@@ -1163,25 +1182,35 @@ async function renderDayBody(d, idx){
       e.target.textContent = e.target.classList.contains('done') ? '✓ Sesión completada' : 'Marcar como hecha';
     };
     document.getElementById(`saveBtn_${idx}`).onclick = async ()=>{
-      const l = await loadLog(dateKey);
-      const btn = document.getElementById(`simpleBtn_${idx}`);
-      const sBtn = document.getElementById(`stretchBtn_${idx}`);
-      const entry = { done: btn.classList.contains('done') };
-      if(isRun){
-        const kmEl = document.getElementById(`kmInput_${idx}`);
-        const ritmoEl = document.getElementById(`ritmoInput_${idx}`);
-        entry.km = kmEl ? kmEl.value : '';
-        entry.ritmo = ritmoEl ? ritmoEl.value : '';
-      }
-      l[dayLogKey] = entry;
-      l[stretchKey] = { done: sBtn.classList.contains('done') };
-      l[commentKey] = document.getElementById(`comment_${idx}`).value;
-      await saveLog(dateKey, l);
       const note = document.getElementById(`savedNote_${idx}`);
-      note.style.display = 'block';
-      setTimeout(()=>{ note.style.display = 'none'; }, 1800);
-      updateBadge(idx);
-      renderSummary();
+      try{
+        const l = await loadLog(dateKey);
+        const btn = document.getElementById(`simpleBtn_${idx}`);
+        const sBtn = document.getElementById(`stretchBtn_${idx}`);
+        const entry = { done: !!(btn && btn.classList.contains('done')) };
+        if(isRun){
+          const kmEl = document.getElementById(`kmInput_${idx}`);
+          const ritmoEl = document.getElementById(`ritmoInput_${idx}`);
+          entry.km = kmEl ? kmEl.value : '';
+          entry.ritmo = ritmoEl ? ritmoEl.value : '';
+        }
+        l[dayLogKey] = entry;
+        l[stretchKey] = { done: !!(sBtn && sBtn.classList.contains('done')) };
+        const commentEl = document.getElementById(`comment_${idx}`);
+        l[commentKey] = commentEl ? commentEl.value : '';
+        await saveLog(dateKey, l);
+        note.textContent = 'Guardado';
+        note.style.color = 'var(--green)';
+        note.style.display = 'block';
+        setTimeout(()=>{ note.style.display = 'none'; }, 1800);
+        updateBadge(idx);
+        renderSummary();
+      }catch(err){
+        console.error('Error guardando el día', err);
+        note.textContent = '⚠️ No se pudo guardar. Prueba a recargar la app.';
+        note.style.color = 'var(--red)';
+        note.style.display = 'block';
+      }
     };
   } else {
     let html = '';
@@ -1262,38 +1291,46 @@ async function renderDayBody(d, idx){
     };
 
     document.getElementById(`saveBtn_${idx}`).onclick = async ()=>{
-      const l = await loadLog(dateKey);
-      const allEx = d.exercises.concat(customList);
-      const prHits = [];
-      for(const ex of allEx){
-        const checkEl = body.querySelector(`.ex-check[data-exid="${ex.id}"]`);
-        if(checkEl){
-          const entry = { done: checkEl.classList.contains('done') };
-          fieldsForMode(ex.mode).forEach(f=>{
-            const el = body.querySelector(`input[data-field="${f.key}"][data-exid="${ex.id}"]`);
-            entry[f.key] = el ? el.value : '';
-          });
-          const field = primaryFieldForMode(ex.mode);
-          const newVal = parseFloat(entry[field]);
-          if(!isNaN(newVal)){
-            const best = await getBestExerciseValue(ex.id, dateKey, ex.mode);
-            if(best!==null && newVal>best) prHits.push(ex.name);
-          }
-          l[ex.id] = entry;
-        }
-      }
-      l[commentKey] = document.getElementById(`comment_${idx}`).value;
-      l[customListKey] = customList;
-      const stretchBtnEl = document.getElementById(`stretchBtn_${idx}`);
-      if(stretchBtnEl) l[`stretch_${dayLogKey}`] = { done: stretchBtnEl.classList.contains('done') };
-      await saveLog(dateKey, l);
       const note = document.getElementById(`savedNote_${idx}`);
-      note.textContent = prHits.length ? `🏆 ¡Nuevo PR en ${prHits.join(', ')}!` : 'Guardado';
-      note.style.color = prHits.length ? 'var(--amber)' : 'var(--green)';
-      note.style.display = 'block';
-      setTimeout(()=>{ note.style.display = 'none'; }, prHits.length ? 3200 : 1800);
-      updateBadge(idx);
-      renderSummary();
+      try{
+        const l = await loadLog(dateKey);
+        const allEx = d.exercises.concat(customList);
+        const prHits = [];
+        for(const ex of allEx){
+          const checkEl = body.querySelector(`.ex-check[data-exid="${ex.id}"]`);
+          if(checkEl){
+            const entry = { done: checkEl.classList.contains('done') };
+            fieldsForMode(ex.mode).forEach(f=>{
+              const el = body.querySelector(`input[data-field="${f.key}"][data-exid="${ex.id}"]`);
+              entry[f.key] = el ? el.value : '';
+            });
+            const field = primaryFieldForMode(ex.mode);
+            const newVal = parseFloat(entry[field]);
+            if(!isNaN(newVal)){
+              const best = await getBestExerciseValue(ex.id, dateKey, ex.mode);
+              if(best!==null && newVal>best) prHits.push(ex.name);
+            }
+            l[ex.id] = entry;
+          }
+        }
+        const commentEl = document.getElementById(`comment_${idx}`);
+        l[commentKey] = commentEl ? commentEl.value : '';
+        l[customListKey] = customList;
+        const stretchBtnEl = document.getElementById(`stretchBtn_${idx}`);
+        if(stretchBtnEl) l[`stretch_${dayLogKey}`] = { done: stretchBtnEl.classList.contains('done') };
+        await saveLog(dateKey, l);
+        note.textContent = prHits.length ? `🏆 ¡Nuevo PR en ${prHits.join(', ')}!` : 'Guardado';
+        note.style.color = prHits.length ? 'var(--amber)' : 'var(--green)';
+        note.style.display = 'block';
+        setTimeout(()=>{ note.style.display = 'none'; }, prHits.length ? 3200 : 1800);
+        updateBadge(idx);
+        renderSummary();
+      }catch(err){
+        console.error('Error guardando el día', err);
+        note.textContent = '⚠️ No se pudo guardar. Prueba a recargar la app.';
+        note.style.color = 'var(--red)';
+        note.style.display = 'block';
+      }
     };
   }
   updateBadge(idx);
@@ -1375,6 +1412,7 @@ function switchView(view){
   if(view==='weight') renderWeightView();
   if(view==='cal') renderCalendar();
   if(view==='prog') renderProgress();
+  try{ localStorage.setItem(uk('lastView'), view); }catch(e){}
 }
 
 /* ---------- CALENDARIO ---------- */
@@ -1801,7 +1839,7 @@ async function getAllWeights(){
 
 async function seedBorjaHistory(){
   if(currentUser !== 'borja') return;
-  const flagKey = 'seeded_history_v2';
+  const flagKey = 'seeded_history_v3';
   const already = await window.storage.get(uk(flagKey));
   if(already) return;
 
@@ -1821,6 +1859,43 @@ async function seedBorjaHistory(){
   l01['p1_d1'] = { done:true, km:'5', ritmo:'5:00-6:00' };
   l01['comment_p1_d1'] = '5 km entre 5 y 6 minutos el km. Muy pesado pero he recuperado rápido. Además he hecho press banca 55kg 40 reps, press sentado con barra 35kg 3x10, y estiramiento de cuádriceps sentado en el banco con unos 10kg, 4 reps.';
   await saveLog('2026-09-01', l01);
+
+  const l02 = await loadLog('2026-09-02');
+  l02['f1_mi_1'] = { done:true, peso:'55', reps:'40' };
+  l02['f1_mi_2'] = { done:true, peso:'20', reps:'30' };
+  l02['f1_mi_3'] = { done:true, peso:'0', reps:'9' };
+  l02['f1_mi_4'] = { done:true, peso:'12', repsL:'30', repsR:'30' };
+  l02['f1_mi_5'] = { done:true, peso:'10', reps:'30' };
+  l02['comment_p1_d2'] = 'Las dominadas me veo muy flojo, me gustaría pillar fuerza. He hecho estrictas 3 series de 3 reps.';
+  await saveLog('2026-09-02', l02);
+
+  const l03 = await loadLog('2026-09-03');
+  l03['p1_d3'] = { done:true, km:'5', ritmo:"5'38" };
+  l03['comment_p1_d3'] = 'Bien, a veces cómodo a veces forzado pero empiezo a recordar.';
+  await saveLog('2026-09-03', l03);
+
+  const l04 = await loadLog('2026-09-04');
+  const bicepsId = 'custom_p1_d4_biceps';
+  l04['customlist_p1_d4'] = [{ id:bicepsId, name:'Curl de bíceps (ambos brazos, peso y reps totales)' }];
+  l04[bicepsId] = { done:true, peso:'20', reps:'90' };
+  l04['f1_vi_1'] = { done:true, peso:'10', reps:'36' };
+  l04['f1_vi_2'] = { done:false, peso:'20', reps:'30' };
+  l04['f1_vi_3'] = { done:true, peso:'8', reps:'90' };
+  l04['f1_vi_4'] = { done:true, peso:'35', reps:'34' };
+  l04['f1_vi_5'] = { done:true, peso:'10', distancia:'60' };
+  l04['comment_p1_d4'] = 'Cuando son dos brazos pongo el peso total y las reps totales; las series suelo mantener las que me pones (normalmente 3).';
+  l04['stretch_p1_d4'] = { done:true };
+  await saveLog('2026-09-04', l04);
+
+  const l05 = await loadLog('2026-09-05');
+  l05['p1_d5'] = { done:true, km:'10', ritmo:'6:00' };
+  l05['comment_p1_d5'] = 'Desnivel positivo 170m, negativo 250m. Bien aunque mucho calor.';
+  await saveLog('2026-09-05', l05);
+
+  const l06 = await loadLog('2026-09-06');
+  l06['stretch_p1_d6'] = { done:true };
+  l06['comment_p1_d6'] = 'Saltos a la comba, unos 5 min.';
+  await saveLog('2026-09-06', l06);
 
   await window.storage.set(uk(flagKey), '1');
 }
@@ -2014,6 +2089,9 @@ async function startApp(){
   await seedBorjaHistory();
   buildPhaseRow();
   goToday();
+  let lastView = 'plan';
+  try{ lastView = localStorage.getItem(uk('lastView')) || 'plan'; }catch(e){}
+  if(lastView !== 'plan') switchView(lastView);
 }
 
 initProfile();
