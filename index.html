@@ -779,6 +779,13 @@ const STRETCHES = {
   ],
 };
 
+const DAILY_TIPS = {
+  fuerza: '💡 Calienta 5-10 min antes de la primera serie pesada — cuanta más fatiga acumulada en la semana, más lo agradecen las articulaciones.',
+  carrera: '💡 Si la salida pasa de 45 min o hace calor, lleva agua — con el calor que describiste el 5/9, la deshidratación pasa factura antes de lo que crees.',
+  recuperacion: '💡 Aprovecha hoy para dormir un poco más si puedes — es el día donde más se nota la diferencia en recuperación.',
+  wod: '💡 Prioriza técnica sobre velocidad, sobre todo en las primeras rondas cuando aún estás fresco.',
+};
+
 async function renderNutriCard(){
   const card = document.getElementById('nutriCard');
   const dateKey = currentDate;
@@ -801,6 +808,7 @@ async function renderNutriCard(){
   const items = [
     { key:'creatina', label:'Creatina', detail:'3-5g, cualquier momento del día (dosis de mantenimiento habitual)' },
     { key:'proteina', label:'Proteína', detail: proteinLine },
+    { key:'carbs', label:'Hidratos', detail:'Prioriza antes/después de entrenar, sobre todo en días de carrera larga' },
     { key:'agua', label:'Hidratación', detail:'Especialmente en días de carrera o calor' },
   ];
 
@@ -816,10 +824,39 @@ async function renderNutriCard(){
       </div>`;
   }).join('');
 
+  const sleepVal = nutri.sueno || '';
+  const sleepRow = `
+    <div class="nutri-row">
+      <div style="flex:1">
+        <div class="nutri-label">Sueño (horas)</div>
+        <div class="nutri-detail">Objetivo: 7-9h para recuperar bien</div>
+      </div>
+      <input type="number" inputmode="decimal" step="0.5" id="sleepInput" value="${sleepVal}" style="width:56px; background:var(--card2); border:0.5px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; padding:7px; text-align:center;">
+    </div>`;
+
+  const dIdx = weekdayIndexFromDate(dateKey);
+  const dDef = plan()[currentPhase].days[dIdx];
+  const tip = dDef ? DAILY_TIPS[stretchKeyFor(dDef)] : null;
+
   card.innerHTML = `
     <div class="nutri-title">🍽️ Hoy</div>
     <div class="nutri-sub">Pautas generales, no sustituyen el consejo de un profesional</div>
-    ${rows}`;
+    ${rows}
+    ${sleepRow}
+    ${tip ? `<div class="nutri-detail" style="margin-top:10px; color:var(--accent);">${tip}</div>` : ''}`;
+
+  const sleepInput = document.getElementById('sleepInput');
+  if(sleepInput){
+    sleepInput.onchange = async ()=>{
+      let n = {};
+      try{
+        const res = await window.storage.get(uk('nutri:' + dateKey));
+        n = res ? JSON.parse(res.value) : {};
+      }catch(e){}
+      n.sueno = sleepInput.value;
+      await window.storage.set(uk('nutri:' + dateKey), JSON.stringify(n));
+    };
+  }
 
   card.querySelectorAll('.nutri-check').forEach(el=>{
     el.onclick = async ()=>{
@@ -909,7 +946,12 @@ function buildPhaseRow(){
     const b = document.createElement('button');
     b.className = 'phase-btn' + (p===currentPhase?' active':'');
     b.textContent = 'Fase ' + p;
-    b.onclick = ()=>{ currentPhase = p; buildPhaseRow(); renderWeek(); };
+    b.onclick = ()=>{
+      currentPhase = p;
+      try{ localStorage.setItem(uk('lastPhase'), String(p)); }catch(e){}
+      buildPhaseRow();
+      renderWeek();
+    };
     row.appendChild(b);
   });
   document.getElementById('subtitle').textContent = plan()[currentPhase].label;
@@ -945,10 +987,7 @@ function dayIcon(d){
 
 async function dayIsDone(dateKey, phase, idx, dayDef){
   const log = await loadLog(dateKey);
-  if(dayDef.simple){
-    return !!(log[`p${phase}_d${idx}`] && log[`p${phase}_d${idx}`].done);
-  }
-  return dayDef.exercises.length>0 && dayDef.exercises.every(ex=> log[ex.id] && log[ex.id].done);
+  return !!(log[`p${phase}_d${idx}`] && log[`p${phase}_d${idx}`].done);
 }
 
 function hasLoggedValue(v){
@@ -1216,7 +1255,13 @@ async function renderDayBody(d, idx){
       }
     };
   } else {
-    let html = '';
+    const sessionDone = !!(log[dayLogKey] && log[dayLogKey].done);
+    let html = `
+      <button class="simple-toggle ${sessionDone?'done':''}" id="sessionBtn_${idx}">
+        ${sessionDone ? '✓ Sesión completada' : 'Marcar sesión como completada'}
+      </button>
+      <div class="ex-target" style="margin:-4px 0 10px; text-align:center;">Aunque no marques cada ejercicio, esto cuenta el día como hecho</div>
+    `;
     for(const ex of d.exercises){
       const exLog = log[ex.id] || {};
       const lastNote = await getLastExerciseNote(ex.id, dateKey, ex.mode);
@@ -1242,6 +1287,11 @@ async function renderDayBody(d, idx){
     document.getElementById(`stretchBtn_${idx}`).onclick = (e)=>{
       e.target.classList.toggle('done');
       e.target.textContent = e.target.classList.contains('done') ? '✓ Estiramientos hechos' : 'Marcar estiramientos como hechos';
+    };
+
+    document.getElementById(`sessionBtn_${idx}`).onclick = (e)=>{
+      e.target.classList.toggle('done');
+      e.target.textContent = e.target.classList.contains('done') ? '✓ Sesión completada' : 'Marcar sesión como completada';
     };
 
     body.querySelectorAll('.ex-check').forEach(el=>{
@@ -1321,6 +1371,8 @@ async function renderDayBody(d, idx){
         l[customListKey] = customList;
         const stretchBtnEl = document.getElementById(`stretchBtn_${idx}`);
         if(stretchBtnEl) l[`stretch_${dayLogKey}`] = { done: stretchBtnEl.classList.contains('done') };
+        const sessionBtnEl = document.getElementById(`sessionBtn_${idx}`);
+        l[dayLogKey] = { done: !!(sessionBtnEl && sessionBtnEl.classList.contains('done')) };
         await saveLog(dateKey, l);
         note.textContent = prHits.length ? `🏆 ¡Nuevo PR en ${prHits.join(', ')}!` : 'Guardado';
         note.style.color = prHits.length ? 'var(--amber)' : 'var(--green)';
@@ -1762,6 +1814,15 @@ async function renderProgress(){
     weeklyKmBars.push({ label: `${start.getDate()}/${start.getMonth()+1}`, value: total });
   }
 
+  const dailyKmBars = [];
+  for(let i=13; i>=0; i--){
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dStr = toLocalISO(d);
+    const total = Math.round(sumKmInRange(kmSeries, dStr, dStr) * 10) / 10;
+    dailyKmBars.push({ label: `${d.getDate()}/${d.getMonth()+1}`, value: total });
+  }
+
   let html = '';
 
   html += `
@@ -1776,6 +1837,13 @@ async function renderProgress(){
       <div class="prog-title">Constancia semanal</div>
       <div class="prog-sub">% de días con sesión registrada, últimas 8 semanas</div>
       ${svgBarChart(weeklyBars, {maxV:100})}
+    </div>`;
+
+  html += `
+    <div class="prog-card">
+      <div class="prog-title">Kilómetros por día</div>
+      <div class="prog-sub">Últimos 14 días</div>
+      ${svgBarChart(dailyKmBars, {flat:true, showValue:true})}
     </div>`;
 
   html += `
@@ -1842,7 +1910,7 @@ async function getAllWeights(){
 
 async function seedBorjaHistory(){
   if(currentUser !== 'borja') return;
-  const flagKey = 'seeded_history_v3';
+  const flagKey = 'seeded_history_v4';
   const already = await window.storage.get(uk(flagKey));
   if(already) return;
 
@@ -1856,6 +1924,7 @@ async function seedBorjaHistory(){
   l31['f1_lu_4'] = { done:true, peso:'10', reps:'60' };
   l31['f1_lu_5'] = { done:true, segundos:'90' };
   l31['comment_p1_d0'] = 'Trote por montaña: 2 km a ritmo 5:20/km';
+  l31['p1_d0'] = { done:true };
   await saveLog('2026-08-31', l31);
 
   const l01 = await loadLog('2026-09-01');
@@ -1870,6 +1939,7 @@ async function seedBorjaHistory(){
   l02['f1_mi_4'] = { done:true, peso:'12', repsL:'30', repsR:'30' };
   l02['f1_mi_5'] = { done:true, peso:'10', reps:'30' };
   l02['comment_p1_d2'] = 'Las dominadas me veo muy flojo, me gustaría pillar fuerza. He hecho estrictas 3 series de 3 reps.';
+  l02['p1_d2'] = { done:true };
   await saveLog('2026-09-02', l02);
 
   const l03 = await loadLog('2026-09-03');
@@ -1888,6 +1958,7 @@ async function seedBorjaHistory(){
   l04['f1_vi_5'] = { done:true, peso:'10', distancia:'60' };
   l04['comment_p1_d4'] = 'Cuando son dos brazos pongo el peso total y las reps totales; las series suelo mantener las que me pones (normalmente 3).';
   l04['stretch_p1_d4'] = { done:true };
+  l04['p1_d4'] = { done:true };
   await saveLog('2026-09-04', l04);
 
   const l05 = await loadLog('2026-09-05');
@@ -1898,7 +1969,10 @@ async function seedBorjaHistory(){
   const l06 = await loadLog('2026-09-06');
   l06['stretch_p1_d6'] = { done:true };
   l06['comment_p1_d6'] = 'Saltos a la comba, unos 5 min.';
+  l06['p1_d6'] = { done:true };
   await saveLog('2026-09-06', l06);
+
+  try{ localStorage.setItem(uk('lastPhase'), '2'); }catch(e){}
 
   await window.storage.set(uk(flagKey), '1');
 }
@@ -2090,6 +2164,10 @@ document.getElementById('datePicker').addEventListener('change', (e)=>{
 
 async function startApp(){
   await seedBorjaHistory();
+  try{
+    const savedPhase = parseInt(localStorage.getItem(uk('lastPhase')), 10);
+    if(savedPhase >= 1 && savedPhase <= 3) currentPhase = savedPhase;
+  }catch(e){}
   buildPhaseRow();
   goToday();
   let lastView = 'plan';
