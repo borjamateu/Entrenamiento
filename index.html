@@ -495,6 +495,7 @@ const PLANS = { borja: {
           {id:"f1_mi_3", name:"Dominadas asistidas / remo polea", target:"3×8-10"},
           {id:"f1_mi_4", name:"Zancadas con mancuerna", target:"2×10/pierna", mode:"unilateral"},
           {id:"f1_mi_5", name:"Kettlebell swing", target:"3×15"},
+          {id:"f1_mi_6", name:"Fondos en paralelas", target:"3×6-8, asistidos con goma si hace falta"},
         ]},
       { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 + 10 min core", simple:true },
       { day:"Viernes", name:"Fuerza C (Full body)", dur:"45-50 min", focus:"Técnica + volumen moderado · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
@@ -526,6 +527,7 @@ const PLANS = { borja: {
           {id:"f2_mi_2", name:"Dominadas / remo polea", target:"3×8-10"},
           {id:"f2_mi_3", name:"Hip thrust", target:"3×10"},
           {id:"f2_mi_4", name:"Face pull", target:"3×15"},
+          {id:"f2_mi_5", name:"Fondos en paralelas", target:"3×8, sube dificultad si te sobran reps"},
         ]},
       { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2", simple:true },
       { day:"Viernes", name:"Full body / metcon corto", dur:"40-45 min", focus:"AMRAP 12-15 min: KB swing, dominadas, air squat, remo", simple:true },
@@ -1092,7 +1094,8 @@ function fieldsForMode(mode){
     case 'carry':
       return [
         {key:'peso', label:'Peso/mano (kg)', type:'number', inputmode:'decimal'},
-        {key:'distancia', label:'Distancia (m)', type:'text', inputmode:'text'},
+        {key:'segundos', label:'Tiempo (segundos)', type:'number', inputmode:'numeric'},
+        {key:'distancia', label:'Distancia (m, opcional)', type:'text', inputmode:'text'},
       ];
     default:
       return [
