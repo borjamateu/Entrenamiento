@@ -780,8 +780,8 @@ const STRETCHES = {
 };
 
 const DAILY_TIPS = {
-  fuerza: '💡 Calienta 5-10 min antes de la primera serie pesada — cuanta más fatiga acumulada en la semana, más lo agradecen las articulaciones.',
-  carrera: '💡 Si la salida pasa de 45 min o hace calor, lleva agua — con el calor que describiste el 5/9, la deshidratación pasa factura antes de lo que crees.',
+  fuerza: '💡 Si te cuesta arrancar hoy, una cápsula de cafeína 30-45 min antes puede ayudarte — resérvala para los días que de verdad lo necesites, no a diario.',
+  carrera: '💡 Si la salida pasa de 60 min o hace calor, lleva agua y valora electrolitos — con el calor que describiste el 5/9, la deshidratación pasa factura antes de lo que crees.',
   recuperacion: '💡 Aprovecha hoy para dormir un poco más si puedes — es el día donde más se nota la diferencia en recuperación.',
   wod: '💡 Prioriza técnica sobre velocidad, sobre todo en las primeras rondas cuando aún estás fresco.',
 };
@@ -810,6 +810,8 @@ async function renderNutriCard(){
     { key:'proteina', label:'Proteína', detail: proteinLine },
     { key:'carbs', label:'Hidratos', detail:'Prioriza antes/después de entrenar, sobre todo en días de carrera larga' },
     { key:'agua', label:'Hidratación', detail:'Especialmente en días de carrera o calor' },
+    { key:'vitd', label:'Vitamina D', detail:'A diario, sobre todo si teletrabajas y pasas poco tiempo al sol' },
+    { key:'omega3', label:'Omega-3', detail:'A diario, salud general y apoyo a la recuperación' },
   ];
 
   const rows = items.map(it=>{
