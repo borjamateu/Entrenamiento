@@ -72,6 +72,7 @@
   .day-card.type-fuerza{border-left-color:var(--accent);}
   .day-card.type-carrera{border-left-color:var(--green);}
   .day-card.type-recuperacion{border-left-color:var(--amber);}
+  .day-card.type-wod{border-left-color:#ff6b4a;}
   .day-card.type-wod{border-left-color:var(--red);}
   .day-card.is-today{background:linear-gradient(180deg, var(--accent-soft), var(--card) 40%);}
 
@@ -408,7 +409,7 @@
 </div>
 
 <div class="footer-nav">
-  <button class="nav-btn active" id="navPlan" onclick="switchView('plan')"><span class="nav-icon">📋</span>Plan</button>
+  <button class="nav-btn active" id="navPlan" onclick="goToday(); switchView('plan');"><span class="nav-icon">📋</span>Plan</button>
   <button class="nav-btn" id="navCal" onclick="switchView('cal')"><span class="nav-icon">📅</span>Calendario</button>
   <button class="nav-btn" id="navProg" onclick="switchView('prog')"><span class="nav-icon">📈</span>Progreso</button>
   <button class="nav-btn" id="navWeight" onclick="switchView('weight')"><span class="nav-icon">⚖️</span>Peso</button>
@@ -487,7 +488,7 @@ const PLANS = { borja: {
           {id:"f1_lu_4", name:"Peso muerto rumano", target:"2×10"},
           {id:"f1_lu_5", name:"Plancha", target:"3×30-40s", mode:"time"},
         ]},
-      { day:"Martes", name:"Carrera suave", dur:"30-40 min", focus:"Z2, rodar", simple:true },
+      { day:"Martes", name:"Carrera suave", dur:"30-40 min", focus:"Z2, rodar · ritmo orientativo 5:45-6:15 min/km", simple:true },
       { day:"Miércoles", name:"Fuerza B (Full body)", dur:"45-50 min", focus:"Técnica + volumen moderado · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
         exercises:[
           {id:"f1_mi_1", name:"Peso muerto convencional", target:"3×6 @ RPE 6"},
@@ -497,7 +498,7 @@ const PLANS = { borja: {
           {id:"f1_mi_5", name:"Kettlebell swing", target:"3×15"},
           {id:"f1_mi_6", name:"Fondos en paralelas", target:"3×6-8, asistidos con goma si hace falta"},
         ]},
-      { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 + 10 min core", simple:true },
+      { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 + 10 min core · ritmo orientativo 5:45-6:15 min/km", simple:true },
       { day:"Viernes", name:"Fuerza C (Full body)", dur:"45-50 min", focus:"Técnica + volumen moderado · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
         exercises:[
           {id:"f1_vi_1", name:"Sentadilla frontal / goblet", target:"3×8"},
@@ -506,7 +507,7 @@ const PLANS = { borja: {
           {id:"f1_vi_4", name:"Hip thrust", target:"3×10"},
           {id:"f1_vi_5", name:"Farmer carry", target:"3×30m", mode:"carry"},
         ]},
-      { day:"Sábado", name:"Carrera larga suave", dur:"40-60 min", focus:"Z2, sin reloj de ritmo", simple:true },
+      { day:"Sábado", name:"Carrera larga suave", dur:"40-60 min", focus:"Z2, sin reloj de ritmo (referencia si te sirve: 5:45-6:30 min/km)", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad + remo/bici muy suave", simple:true },
     ]
   },
@@ -520,7 +521,7 @@ const PLANS = { borja: {
           {id:"f2_lu_3", name:"Press militar", target:"3×8"},
           {id:"f2_lu_4", name:"Zancadas", target:"3×10/pierna", mode:"unilateral"},
         ]},
-      { day:"Martes", name:"Carrera calidad (series)", dur:"35-40 min", focus:"6×400m ritmo rápido, rec. 90s", simple:true },
+      { day:"Martes", name:"Carrera calidad (series)", dur:"35-40 min", focus:"6×400m ritmo rápido, rec. 90s · referencia 4:20-4:50 min/km en las series", simple:true },
       { day:"Miércoles", name:"Fuerza B (Tirón/pierna)", dur:"50-60 min", focus:"Fuerza, RPE 7 · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
         exercises:[
           {id:"f2_mi_1", name:"Peso muerto convencional", target:"RPE 7"},
@@ -529,9 +530,9 @@ const PLANS = { borja: {
           {id:"f2_mi_4", name:"Face pull", target:"3×15"},
           {id:"f2_mi_5", name:"Fondos en paralelas", target:"3×8, sube dificultad si te sobran reps"},
         ]},
-      { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2", simple:true },
+      { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 · ritmo orientativo 5:45-6:15 min/km", simple:true },
       { day:"Viernes", name:"Full body / metcon corto", dur:"40-45 min", focus:"AMRAP 12-15 min: KB swing, dominadas, air squat, remo", simple:true },
-      { day:"Sábado", name:"Carrera larga", dur:"45-70 min", focus:"Z2, subiendo volumen", simple:true },
+      { day:"Sábado", name:"Carrera larga", dur:"45-70 min", focus:"Z2, subiendo volumen · ritmo orientativo 5:45-6:15 min/km, prioriza terminar la distancia sobre el ritmo", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
     ]
   },
@@ -973,8 +974,10 @@ function mondayOfWeek(dateStr){
 
 function dayTypeClass(d){
   if(d.simple){
-    if(d.name.toLowerCase().includes('recuper')) return 'type-recuperacion';
-    return 'type-carrera';
+    const n = d.name.toLowerCase();
+    if(n.includes('recuper')) return 'type-recuperacion';
+    if(n.includes('carrera')) return 'type-carrera';
+    return 'type-wod';
   }
   return 'type-fuerza';
 }
@@ -1911,7 +1914,7 @@ async function getAllWeights(){
 
 async function seedBorjaHistory(){
   if(currentUser !== 'borja') return;
-  const flagKey = 'seeded_history_v4';
+  const flagKey = 'seeded_history_v5';
   const already = await window.storage.get(uk(flagKey));
   if(already) return;
 
@@ -1974,6 +1977,53 @@ async function seedBorjaHistory(){
   await saveLog('2026-09-06', l06);
 
   try{ localStorage.setItem(uk('lastPhase'), '2'); }catch(e){}
+
+  await window.storage.set(uk('weight:2026-09-09'), '95.1');
+  await window.storage.set(uk('weight:2026-09-10'), '95.2');
+
+  const l07 = await loadLog('2026-09-07');
+  l07['f2_lu_1'] = { done:true, peso:'35.4755', reps:'24' };
+  l07['f2_lu_2'] = { done:true, peso:'55', reps:'30' };
+  l07['f2_lu_3'] = { done:true, peso:'47', reps:'24' };
+  l07['f2_lu_4'] = { done:true, peso:'20', repsL:'30', repsR:'30' };
+  l07['comment_p2_d0'] = 'Cuando pongo punto y otros números es que le voy subiendo peso a la serie';
+  l07['p2_d0'] = { done:true };
+  await saveLog('2026-09-07', l07);
+
+  const l08 = await loadLog('2026-09-08');
+  l08['p2_d1'] = { done:true, km:'4.40', ritmo:'6:00' };
+  l08['comment_p2_d1'] = "La series siempre por debajo de 5 o al límite. Alguna a 4'20 al principio. El resto de distancia ha sido andando o trote inicial";
+  await saveLog('2026-09-08', l08);
+
+  const l09 = await loadLog('2026-09-09');
+  const curlId09 = 'custom_p2_d2_curl';
+  l09['customlist_p2_d2'] = [{ id:curlId09, name:'Curl con mancuernas' }];
+  l09[curlId09] = { done:true, peso:'20', reps:'60' };
+  l09['f2_mi_1'] = { done:true, peso:'55', reps:'30' };
+  l09['f2_mi_2'] = { done:true, peso:'0', reps:'12' };
+  l09['f2_mi_3'] = { done:true, peso:'35', reps:'30' };
+  l09['f2_mi_4'] = { done:true, peso:'12', reps:'60' };
+  l09['f2_mi_5'] = { done:true, peso:'0', reps:'15' };
+  l09['comment_p2_d2'] = 'Cuando pongo 0 kg suele ser con mi peso';
+  l09['p2_d2'] = { done:true };
+  await saveLog('2026-09-09', l09);
+
+  const l10 = await loadLog('2026-09-10');
+  l10['p2_d3'] = { done:true, km:'6', ritmo:'6:00' };
+  await saveLog('2026-09-10', l10);
+
+  const l11 = await loadLog('2026-09-11');
+  l11['p2_d4'] = { done:true };
+  await saveLog('2026-09-11', l11);
+
+  const l12 = await loadLog('2026-09-12');
+  l12['p2_d5'] = { done:true, km:'14', ritmo:'6:00' };
+  l12['comment_p2_d5'] = '200m de desnivel positivos. Anotado salir más pronto por el calor';
+  await saveLog('2026-09-12', l12);
+
+  const l13 = await loadLog('2026-09-13');
+  l13['p2_d6'] = { done:true };
+  await saveLog('2026-09-13', l13);
 
   await window.storage.set(uk(flagKey), '1');
 }
