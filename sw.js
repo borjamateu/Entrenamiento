@@ -1,4 +1,4 @@
-const CACHE = 'entrenamiento-v2';
+const CACHE = 'entrenamiento-v3';
 const CORE_ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './comparativa.json'];
 
 self.addEventListener('install', (e) => {
