@@ -105,6 +105,7 @@
   .ex-name{font-size:14px; font-weight:500;}
   .ex-target{font-size:12px; color:var(--text2); margin-top:2px;}
   .ex-last{font-size:11.5px; color:var(--accent); margin-top:2px;}
+  .ex-note{font-size:11.5px; color:var(--text2); margin-top:4px; line-height:1.4; border-left:2px solid var(--accent2); padding-left:7px;}
   .ex-check{
     width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border);
     flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--muted);
@@ -557,6 +558,68 @@ const PLANS = { borja: {
       { day:"Sábado", name:"Carrera larga", dur:"50-75 min", focus:"Z2, ritmo orientativo 5:45-6:15 min/km · puedes cortar a andar si lo necesitas, prioriza la distancia", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
     ]
+  },
+  4: {
+    label: "Fase 4 · Última semana de carga",
+    days: [
+      { day:"Lunes", name:"Fuerza A (Pierna + empuje)", dur:"50-55 min", focus:"Última sesión pesada de pierna antes de la carrera. RPE 7: te tienen que sobrar 2-3 reps, sin llegar al fallo. Calienta 5 min de bici/remo + 2 series de aproximación en sentadilla y banca. Anota peso total y reps totales, como ya haces.",
+        exercises:[
+          {id:"f3_lu_1", name:"Sentadilla trasera", target:"4×6 @ RPE 7 · descanso 2-3 min", note:"Salida 60 kg (55 kg a ~11 reps por serie iba holgado). Total: 24 reps. Sube 2,5-5 kg solo si las 4 series salen limpias."},
+          {id:"f3_mi_1", name:"Press banca", target:"4×6 @ RPE 7 · descanso 2 min", note:"Salida 60 kg (55 kg a ~12 reps por serie iba holgado). Baja en 2 s, sube rápido. Total: 24 reps."},
+          {id:"f3_lu_2", name:"Peso muerto rumano", target:"3×8 · bajada de 3 s · descanso 90 s", note:"Salida 40 kg con barra. Cadera atrás, espalda neutra, tensión en isquios. Total: 24 reps."},
+          {id:"f2_lu_4", name:"Zancadas con mancuernas", target:"3×10/pierna · descanso 90 s", mode:"unilateral", note:"Peso total de las dos mancuernas: 20 kg como el día 7; sube 2-4 kg si sobra. Paso corto y controlado por el tobillo."},
+          {id:"f4_lu_5", name:"Elevaciones laterales con mancuernas", target:"3×12-15 · descanso 60 s", note:"Peso total ligero (8-12 kg entre las dos). Hasta la altura del hombro, sin balanceo."},
+          {id:"f4_lu_6", name:"Pallof press (goma o polea)", target:"3×10/lado · descanso 45 s", mode:"unilateral", note:"Core anti-rotación. Pausa de 2 s con los brazos estirados."},
+        ]},
+      { day:"Martes", name:"Carrera calidad (tempo)", dur:"40-45 min", focus:"10 min fácil + 3×8 min a ritmo tempo (~5:15-5:30 min/km, RPE 7, duro pero controlado) con 2 min de trote entre bloques + 8 min fácil. Guíate por sensaciones. Si el tobillo molesta, cámbialo por 35-40 min de bici/remo Z2.", simple:true },
+      { day:"Miércoles", name:"Fuerza B (Tirón + hombro + brazos)", dur:"50 min", focus:"RPE 7, sin fallo. Hoy entran los brazos: menos reps y más carga que en semanas anteriores. Anota peso total y reps totales.",
+        exercises:[
+          {id:"f3_mi_2", name:"Dominadas estrictas", target:"4×4 · descanso 2 min", note:"Meta: 4 limpias en cada serie (16 totales; la semana pasada 15). Si falla la 4ª, usa goma."},
+          {id:"f3_mi_3", name:"Press militar de pie con barra", target:"4×6 @ RPE 7 · descanso 2 min", note:"Salida 40 kg. Glúteo y abdomen apretados, sin arquear la espalda. Total: 24 reps."},
+          {id:"f1_lu_3", name:"Remo con barra", target:"4×8 · descanso 90 s", note:"Salida 40 kg. Tronco a ~45°, tira hacia el ombligo. Total: 32 reps."},
+          {id:"f2_mi_5", name:"Fondos en paralelas", target:"3×6-8 · descanso 90 s", note:"La semana pasada 15 totales (3×5). Meta: 3×6."},
+          {id:"f4_mi_5", name:"Curl de bíceps (barra o mancuernas)", target:"3×10 · descanso 60 s", note:"Elige el peso con el que llegues a 10 con 2 reps de reserva; venías haciendo series de 20+ reps con 20 kg totales, sube la carga."},
+          {id:"f4_mi_6", name:"Extensión de tríceps sobre la cabeza", target:"3×12 · descanso 60 s", note:"Mancuerna a dos manos o polea con cuerda. Codos cerrados."},
+          {id:"f4_mi_7", name:"Comba (finisher)", target:"5 min: 1 min salto / 30 s descanso", mode:"time", note:"Solo si el tobillo está bien; si duele, sáltatela. Anota los segundos de salto."},
+        ]},
+      { day:"Jueves", name:"Carrera suave + core y tobillo", dur:"40-45 min", focus:"30 min Z2 a 5:45-6:15 min/km (no bajes de 5:45: los jueves anteriores saliste a 5:30 y eso te resta frescura para el sábado). Después 10 min de core y tobillo, 3 rondas: 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof por lado · 30 s de equilibrio a una pierna por pie.", simple:true },
+      { day:"Viernes", name:"Recuperación + activación pre-tirada", dur:"25-30 min", focus:"Sin WOD ni piernas: es el día antes del largo. Empieza con 10 min de bici/remo muy suave y 8 min de movilidad de cadera y tobillo, y después esto. Si terminas cansado, te has pasado.",
+        exercises:[
+          {id:"f4_vi_1", name:"Puente de glúteo a una pierna", target:"2×10/pierna", mode:"unilateral", note:"Activación, no fatiga. Peso corporal (0 kg), pausa de 1 s arriba."},
+          {id:"f4_vi_2", name:"Band walks (goma en rodillas)", target:"2×12 pasos por lado", note:"Glúteo medio y cadera. Anota los pasos totales."},
+          {id:"f4_vi_3", name:"Elevación de talones a una pierna", target:"2×12/pierna · bajada de 3 s", mode:"unilateral", note:"Tobillo y gemelo. Apóyate en la pared si hace falta."},
+          {id:"f4_vi_4", name:"Dead bug", target:"2×8/lado", note:"Espalda pegada al suelo, movimiento lento. Anota reps totales."},
+        ]},
+      { day:"Sábado", name:"Carrera larga (último largo)", dur:"80-95 min", focus:"Z2 a 5:50-6:20 min/km, sin forzar. Sal temprano por el calor. Ensaya lo de carrera: mismas zapatillas, desayuno 2-3 h antes y 1 gel/hidratación hacia el km 8-10. Andar en las cuestas es válido. Si el tobillo molesta, para y cierra ahí.", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad + paseo o bici muy suave. Añade 5 min de ejercicios de tobillo (círculos, equilibrio a una pierna).", simple:true },
+    ]
+  },
+  5: {
+    label: "Fase 5 · Semana de carrera (taper)",
+    days: [
+      { day:"Lunes", name:"Fuerza full body ligera", dur:"35-40 min", focus:"Última sesión de fuerza. Misma carga, la mitad de series, todo a RPE 6 y sin fallo. Objetivo: que el miércoles no tengas ni una agujeta.",
+        exercises:[
+          {id:"f3_lu_1", name:"Sentadilla trasera", target:"2×5 @ RPE 6 · descanso 2 min", note:"55-60 kg, rápida y limpia. Total: 10 reps."},
+          {id:"f3_mi_1", name:"Press banca", target:"2×5 @ RPE 6 · descanso 2 min", note:"60 kg. Total: 10 reps."},
+          {id:"f1_lu_3", name:"Remo con barra", target:"2×8 · descanso 90 s", note:"40 kg. Total: 16 reps."},
+          {id:"f3_mi_2", name:"Dominadas estrictas", target:"2×4 · descanso 2 min", note:"Total: 8 reps, sin goma si la semana anterior salieron limpias."},
+          {id:"f5_lu_5", name:"Curl martillo con mancuernas", target:"2×10 · descanso 60 s", note:"Peso total moderado, 2 reps de reserva."},
+          {id:"f1_lu_5", name:"Plancha", target:"2×40 s", mode:"time", note:"Anota los segundos totales."},
+        ]},
+      { day:"Martes", name:"Carrera con toques de ritmo", dur:"30-35 min", focus:"10 min fácil + 4×3 min a ritmo objetivo de carrera (~5:50-6:00 min/km en llano, o por esfuerzo si hay cuesta) con 2 min de trote entre bloques + 6 min fácil. Tiene que salir fácil: si pierdes el ritmo, no lo fuerces.", simple:true },
+      { day:"Miércoles", name:"Fuerza mínima de torso + core", dur:"30 min", focus:"Solo para mantener el tacto, sin cargar piernas. RPE 6.",
+        exercises:[
+          {id:"f3_mi_3", name:"Press militar", target:"2×6 @ RPE 6 · descanso 90 s", note:"35-40 kg. Total: 12 reps."},
+          {id:"f3_mi_2", name:"Dominadas estrictas", target:"2×4 · descanso 90 s", note:"Total: 8 reps."},
+          {id:"f5_mi_3", name:"Remo con mancuerna a una mano", target:"2×10/lado · descanso 60 s", mode:"unilateral", note:"Peso de la mancuerna individual."},
+          {id:"f4_lu_5", name:"Elevaciones laterales con mancuernas", target:"2×15 · descanso 45 s", note:"Peso total ligero."},
+          {id:"f4_lu_6", name:"Pallof press (goma o polea)", target:"2×10/lado · descanso 45 s", mode:"unilateral", note:"Pausa de 2 s con los brazos estirados."},
+        ]},
+      { day:"Jueves", name:"Carrera suave + progresivos", dur:"25-30 min", focus:"20 min muy fácil a 5:50-6:30 min/km + 4 progresivos de 20 s (acelera sin sprintar) con 40 s andando entre ellos.", simple:true },
+      { day:"Viernes", name:"Descanso + movilidad", dur:"15-20 min", focus:"Descanso real. 10-15 min de movilidad suave, hidrátate, deja preparado el dorsal, la ropa y los geles, y acuéstate temprano.", simple:true },
+      { day:"Sábado", name:"Carrera suave (shakeout)", dur:"15-20 min", focus:"3-4 km muy suaves + 4 progresivos de 20 s. Solo para soltar las piernas; termina con ganas de más.", simple:true },
+      { day:"Domingo", name:"🏁 Carrera Trail 21K", dur:"≈2-2:30 h", focus:"Los primeros 5 km, 10-15 s/km más lento de lo que pida el cuerpo. Camina las cuestas duras desde el principio. A partir del minuto 40-45, 30-60 g de carbohidrato por hora y bebe a sorbos en cada avituallamiento. Anota tiempo y sensaciones abajo.", simple:true },
+    ]
   }
 },
 tati: {
@@ -651,8 +714,9 @@ const RUN_RAMP = {
     { date:'2026-09-05', km:10 },
     { date:'2026-09-12', km:14 },
     { date:'2026-09-19', km:17 },
-    { date:'2026-09-26', km:20 },
-    { date:'2026-10-03', km:5, note:'shakeout muy suave, no rodaje largo' },
+    { date:'2026-09-26', km:14, note:'último largo, sin forzar' },
+    { date:'2026-10-03', km:4, note:'shakeout muy suave, no rodaje largo' },
+    { date:'2026-10-04', km:21, note:'🏁 carrera' },
   ],
   tati: [
     { date:'2026-09-05', km:6 },
@@ -949,7 +1013,7 @@ async function saveLog(dateKey, data){
 function buildPhaseRow(){
   const row = document.getElementById('phaseRow');
   row.innerHTML = '';
-  [1,2,3].forEach(p=>{
+  Object.keys(plan()).map(Number).sort((a,b)=>a-b).forEach(p=>{
     const b = document.createElement('button');
     b.className = 'phase-btn' + (p===currentPhase?' active':'');
     b.textContent = 'Fase ' + p;
@@ -1171,7 +1235,7 @@ function formatLogValue(fields, exLog){
     .filter(Boolean).join(' · ');
 }
 
-function exerciseRowHtml(id, name, target, exLog, lastNote, mode){
+function exerciseRowHtml(id, name, target, exLog, lastNote, mode, note){
   const fields = fieldsForMode(mode);
   const inputsHtml = fields.map(f=>`
     <div style="flex:1">
@@ -1184,6 +1248,7 @@ function exerciseRowHtml(id, name, target, exLog, lastNote, mode){
         <div>
           <div class="ex-name">${name}</div>
           <div class="ex-target">${target}</div>
+          ${note ? `<div class="ex-note">${note}</div>` : ''}
           ${lastNote ? `<div class="ex-last">${lastNote}</div>` : ''}
         </div>
         <div class="ex-check ${exLog.done?'done':''}" data-exid="${id}">${exLog.done?'✓':''}</div>
@@ -1294,7 +1359,7 @@ async function renderDayBody(d, idx){
     for(const ex of d.exercises){
       const exLog = log[ex.id] || {};
       const lastNote = await getLastExerciseNote(ex.id, dateKey, ex.mode);
-      html += exerciseRowHtml(ex.id, ex.name, ex.target, exLog, lastNote, ex.mode);
+      html += exerciseRowHtml(ex.id, ex.name, ex.target, exLog, lastNote, ex.mode, ex.note);
     }
     customList.forEach(ex=>{
       const exLog = log[ex.id] || {};
@@ -2242,7 +2307,7 @@ async function startApp(){
   await seedBorjaHistory();
   try{
     const savedPhase = parseInt(localStorage.getItem(uk('lastPhase')), 10);
-    if(savedPhase >= 1 && savedPhase <= 3) currentPhase = savedPhase;
+    if(savedPhase && plan()[savedPhase]) currentPhase = savedPhase;
   }catch(e){}
   buildPhaseRow();
   goToday();
