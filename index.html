@@ -590,7 +590,7 @@ const PLANS = { borja: {
           {id:"f4_vi_3", name:"Elevación de talones a una pierna", target:"2×12/pierna · bajada de 3 s", mode:"unilateral", note:"Tobillo y gemelo. Apóyate en la pared si hace falta."},
           {id:"f4_vi_4", name:"Dead bug", target:"2×8/lado", note:"Espalda pegada al suelo, movimiento lento. Anota reps totales."},
         ]},
-      { day:"Sábado", name:"Carrera larga (último largo)", dur:"80-95 min", focus:"Z2 a 5:50-6:20 min/km, sin forzar. Sal temprano por el calor. Ensaya lo de carrera: mismas zapatillas, desayuno 2-3 h antes y 1 gel/hidratación hacia el km 8-10. Andar en las cuestas es válido. Si el tobillo molesta, para y cierra ahí.", simple:true },
+      { day:"Sábado", name:"Carrera larga (último largo)", dur:"65-75 min", focus:"Unos 11 km a 5:50-6:20 min/km en llano, sin forzar. Ya has cubierto la distancia de carrera (17 km el 19/9), así que hoy no se busca volumen: busca un recorrido con cuestas (si puedes, ~250 m de desnivel positivo) y anota el desnivel en el comentario. Camina las subidas duras como harás en carrera. Ensaya lo del domingo 4/10: sal sobre las 9:00, mismas zapatillas, desayuno 2-3 h antes y prueba la hidratación (y un gel hacia el minuto 45 si vas a llevarlo). Si el tobillo molesta, para y cierra ahí.", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad + paseo o bici muy suave. Añade 5 min de ejercicios de tobillo (círculos, equilibrio a una pierna).", simple:true },
     ]
   },
@@ -606,7 +606,7 @@ const PLANS = { borja: {
           {id:"f5_lu_5", name:"Curl martillo con mancuernas", target:"2×10 · descanso 60 s", note:"Peso total moderado, 2 reps de reserva."},
           {id:"f1_lu_5", name:"Plancha", target:"2×40 s", mode:"time", note:"Anota los segundos totales."},
         ]},
-      { day:"Martes", name:"Carrera con toques de ritmo", dur:"30-35 min", focus:"10 min fácil + 4×3 min a ritmo objetivo de carrera (~5:50-6:00 min/km en llano, o por esfuerzo si hay cuesta) con 2 min de trote entre bloques + 6 min fácil. Tiene que salir fácil: si pierdes el ritmo, no lo fuerces.", simple:true },
+      { day:"Martes", name:"Carrera con toques de ritmo", dur:"30-35 min", focus:"10 min fácil + 4×3 min a ritmo objetivo de carrera (~5:40-5:50 min/km en llano, o por esfuerzo si hay cuesta) con 2 min de trote entre bloques + 6 min fácil. Tiene que salir fácil: si pierdes el ritmo, no lo fuerces.", simple:true },
       { day:"Miércoles", name:"Fuerza mínima de torso + core", dur:"30 min", focus:"Solo para mantener el tacto, sin cargar piernas. RPE 6.",
         exercises:[
           {id:"f3_mi_3", name:"Press militar", target:"2×6 @ RPE 6 · descanso 90 s", note:"35-40 kg. Total: 12 reps."},
@@ -618,7 +618,7 @@ const PLANS = { borja: {
       { day:"Jueves", name:"Carrera suave + progresivos", dur:"25-30 min", focus:"20 min muy fácil a 5:50-6:30 min/km + 4 progresivos de 20 s (acelera sin sprintar) con 40 s andando entre ellos.", simple:true },
       { day:"Viernes", name:"Descanso + movilidad", dur:"15-20 min", focus:"Descanso real. 10-15 min de movilidad suave, hidrátate, deja preparado el dorsal, la ropa y los geles, y acuéstate temprano.", simple:true },
       { day:"Sábado", name:"Carrera suave (shakeout)", dur:"15-20 min", focus:"3-4 km muy suaves + 4 progresivos de 20 s. Solo para soltar las piernas; termina con ganas de más.", simple:true },
-      { day:"Domingo", name:"🏁 Carrera Trail 21K", dur:"≈2-2:30 h", focus:"Los primeros 5 km, 10-15 s/km más lento de lo que pida el cuerpo. Camina las cuestas duras desde el principio. A partir del minuto 40-45, 30-60 g de carbohidrato por hora y bebe a sorbos en cada avituallamiento. Anota tiempo y sensaciones abajo.", simple:true },
+      { day:"Domingo", name:"🏁 Carrera Trail 15K (+500 m D+)", dur:"≈1:30-1:50 h", focus:"Salida a las 9:00. Los primeros 3 km, 10-15 s/km más lento de lo que pida el cuerpo. Camina las cuestas duras desde el principio: con +500 m en 15 km, el desnivel pesa más que la distancia. Bebe a sorbos en cada avituallamiento y, si lo has probado antes, un gel hacia el minuto 40-45. Anota tiempo y sensaciones abajo.", simple:true },
     ]
   }
 },
@@ -707,16 +707,16 @@ tati: {
 };
 
 const RACE_DATE = '2026-10-04';
-const RACE_TARGET = { borja: '21 km', tati: '12 km' };
+const RACE_TARGET = { borja: '15 km · +500 m', tati: '12 km' };
 const USER_LABEL = { borja: 'Borja', tati: 'Tati' };
 const RUN_RAMP = {
   borja: [
     { date:'2026-09-05', km:10 },
     { date:'2026-09-12', km:14 },
     { date:'2026-09-19', km:17 },
-    { date:'2026-09-26', km:14, note:'último largo, sin forzar' },
+    { date:'2026-09-26', km:11, note:'último largo, con cuestas, sin forzar' },
     { date:'2026-10-03', km:4, note:'shakeout muy suave, no rodaje largo' },
-    { date:'2026-10-04', km:21, note:'🏁 carrera' },
+    { date:'2026-10-04', km:15, note:'🏁 carrera · +500 m D+' },
   ],
   tati: [
     { date:'2026-09-05', km:6 },
