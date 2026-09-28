@@ -489,7 +489,7 @@ const PLANS = { borja: {
           {id:"f1_lu_4", name:"Peso muerto rumano", target:"2×10"},
           {id:"f1_lu_5", name:"Plancha", target:"3×30-40s", mode:"time"},
         ]},
-      { day:"Martes", name:"Carrera suave", dur:"30-40 min", focus:"Z2, rodar · ritmo orientativo 5:45-6:15 min/km", simple:true },
+      { swim:true, day:"Martes", name:"Carrera suave", dur:"30-40 min", focus:"Z2, rodar · ritmo orientativo 5:45-6:15 min/km", simple:true },
       { day:"Miércoles", name:"Fuerza B (Full body)", dur:"45-50 min", focus:"Técnica + volumen moderado · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
         exercises:[
           {id:"f1_mi_1", name:"Peso muerto convencional", target:"3×6 @ RPE 6"},
@@ -499,7 +499,7 @@ const PLANS = { borja: {
           {id:"f1_mi_5", name:"Kettlebell swing", target:"3×15"},
           {id:"f1_mi_6", name:"Fondos en paralelas", target:"3×6-8, asistidos con goma si hace falta"},
         ]},
-      { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 + 10 min core · ritmo orientativo 5:45-6:15 min/km", simple:true },
+      { swim:true, day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 + 10 min core · ritmo orientativo 5:45-6:15 min/km", simple:true },
       { day:"Viernes", name:"Fuerza C (Full body)", dur:"45-50 min", focus:"Técnica + volumen moderado · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
         exercises:[
           {id:"f1_vi_1", name:"Sentadilla frontal / goblet", target:"3×8"},
@@ -522,7 +522,7 @@ const PLANS = { borja: {
           {id:"f2_lu_3", name:"Press militar", target:"3×8"},
           {id:"f2_lu_4", name:"Zancadas", target:"3×10/pierna", mode:"unilateral"},
         ]},
-      { day:"Martes", name:"Carrera calidad (series)", dur:"35-40 min", focus:"6×400m ritmo rápido, rec. 90s · referencia 4:20-4:50 min/km en las series", simple:true },
+      { swim:true, day:"Martes", name:"Carrera calidad (series)", dur:"35-40 min", focus:"6×400m ritmo rápido, rec. 90s · referencia 4:20-4:50 min/km en las series", simple:true },
       { day:"Miércoles", name:"Fuerza B (Tirón/pierna)", dur:"50-60 min", focus:"Fuerza, RPE 7 · Si te apetece, suma 20-30 min de carrera fácil ese mismo día sin quitar la fuerza (de cara al trail)",
         exercises:[
           {id:"f2_mi_1", name:"Peso muerto convencional", target:"RPE 7"},
@@ -531,7 +531,7 @@ const PLANS = { borja: {
           {id:"f2_mi_4", name:"Face pull", target:"3×15"},
           {id:"f2_mi_5", name:"Fondos en paralelas", target:"3×8, sube dificultad si te sobran reps"},
         ]},
-      { day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 · ritmo orientativo 5:45-6:15 min/km", simple:true },
+      { swim:true, day:"Jueves", name:"Carrera suave + core", dur:"30-35 min", focus:"Z2 · ritmo orientativo 5:45-6:15 min/km", simple:true },
       { day:"Viernes", name:"Full body / metcon corto", dur:"40-45 min", focus:"AMRAP 14 min — cronometra el tiempo y cuenta rondas completas. Por ronda: 15 kettlebell swings · 6 dominadas (asistidas con goma si hace falta) · 15 air squats · 10 remo con barra (peso ligero-moderado, prioriza técnica). Anota abajo cuántas rondas completas hagas.", simple:true },
       { day:"Sábado", name:"Carrera larga", dur:"45-70 min", focus:"Z2, subiendo volumen · ritmo orientativo 5:45-6:15 min/km, prioriza terminar la distancia sobre el ritmo · puedes cortar a andar si lo necesitas, no pasa nada", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
@@ -546,14 +546,14 @@ const PLANS = { borja: {
           {id:"f3_lu_2", name:"Peso muerto rumano", target:"3×8"},
           {id:"f3_lu_3", name:"Zancadas búlgaras", target:"3×8/pierna", mode:"unilateral"},
         ]},
-      { day:"Martes", name:"Carrera calidad (tempo)", dur:"35-40 min", focus:"Ritmo umbral", simple:true },
+      { swim:true, day:"Martes", name:"Carrera calidad (tempo)", dur:"35-40 min", focus:"Ritmo umbral", simple:true },
       { day:"Miércoles", name:"Fuerza pesada (torso)", dur:"50-60 min", focus:"RPE 8",
         exercises:[
           {id:"f3_mi_1", name:"Press banca", target:"RPE 8"},
           {id:"f3_mi_2", name:"Dominadas lastradas", target:"3×6-8"},
           {id:"f3_mi_3", name:"Press militar", target:"3×8"},
         ]},
-      { day:"Jueves", name:"Carrera suave + core", dur:"30 min", focus:"Z2", simple:true },
+      { swim:true, day:"Jueves", name:"Carrera suave + core", dur:"30 min", focus:"Z2", simple:true },
       { day:"Viernes", name:"WOD estilo CrossFit", dur:"30-40 min", focus:"EMOM 16 min (4 rondas de 4 movimientos, 1 min cada uno): min1 kettlebell swings x15 · min2 dominadas x6-8 · min3 air squats x18 · min4 remo con barra x10. Si te sobra tiempo dentro del minuto, descansa lo que quede. Anota abajo cuántas rondas completas hagas.", simple:true },
       { day:"Sábado", name:"Carrera larga", dur:"50-75 min", focus:"Z2, ritmo orientativo 5:45-6:15 min/km · puedes cortar a andar si lo necesitas, prioriza la distancia", simple:true },
       { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad", simple:true },
@@ -571,7 +571,7 @@ const PLANS = { borja: {
           {id:"f4_lu_5", name:"Elevaciones laterales con mancuernas", target:"3×12-15 · descanso 60 s", note:"Peso total ligero (8-12 kg entre las dos). Hasta la altura del hombro, sin balanceo."},
           {id:"f4_lu_6", name:"Pallof press (goma o polea)", target:"3×10/lado · descanso 45 s", mode:"unilateral", note:"Core anti-rotación. Pausa de 2 s con los brazos estirados."},
         ]},
-      { day:"Martes", name:"Carrera calidad (tempo)", dur:"40-45 min", focus:"10 min fácil + 3×8 min a ritmo tempo (~5:15-5:30 min/km, RPE 7, duro pero controlado) con 2 min de trote entre bloques + 8 min fácil. Guíate por sensaciones. Si el tobillo molesta, cámbialo por 35-40 min de bici/remo Z2.", simple:true },
+      { swim:true, day:"Martes", name:"Carrera calidad (tempo)", dur:"40-45 min", focus:"10 min fácil + 3×8 min a ritmo tempo (~5:15-5:30 min/km, RPE 7, duro pero controlado) con 2 min de trote entre bloques + 8 min fácil. Guíate por sensaciones. Si el tobillo molesta, cámbialo por 35-40 min de bici/remo Z2.", simple:true },
       { day:"Miércoles", name:"Fuerza B (Tirón + hombro + brazos)", dur:"50 min", focus:"RPE 7, sin fallo. Hoy entran los brazos: menos reps y más carga que en semanas anteriores. Anota peso total y reps totales.",
         exercises:[
           {id:"f3_mi_2", name:"Dominadas estrictas", target:"4×4 · descanso 2 min", note:"Meta: 4 limpias en cada serie (16 totales; la semana pasada 15). Si falla la 4ª, usa goma."},
@@ -582,7 +582,7 @@ const PLANS = { borja: {
           {id:"f4_mi_6", name:"Extensión de tríceps sobre la cabeza", target:"3×12 · descanso 60 s", note:"Mancuerna a dos manos o polea con cuerda. Codos cerrados."},
           {id:"f4_mi_7", name:"Comba (finisher)", target:"5 min: 1 min salto / 30 s descanso", mode:"time", note:"Solo si el tobillo está bien; si duele, sáltatela. Anota los segundos de salto."},
         ]},
-      { day:"Jueves", name:"Carrera suave + core y tobillo", dur:"40-45 min", focus:"30 min Z2 a 5:45-6:15 min/km (no bajes de 5:45: los jueves anteriores saliste a 5:30 y eso te resta frescura para el sábado). Después 10 min de core y tobillo, 3 rondas: 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof por lado · 30 s de equilibrio a una pierna por pie.", simple:true },
+      { swim:true, day:"Jueves", name:"Carrera suave + core y tobillo", dur:"40-45 min", focus:"30 min Z2 a 5:45-6:15 min/km (no bajes de 5:45: los jueves anteriores saliste a 5:30 y eso te resta frescura para el sábado). Después 10 min de core y tobillo, 3 rondas: 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof por lado · 30 s de equilibrio a una pierna por pie.", simple:true },
       { day:"Viernes", name:"Recuperación + activación pre-tirada", dur:"25-30 min", focus:"Sin WOD ni piernas: es el día antes del largo. Empieza con 10 min de bici/remo muy suave y 8 min de movilidad de cadera y tobillo, y después esto. Si terminas cansado, te has pasado.",
         exercises:[
           {id:"f4_vi_1", name:"Puente de glúteo a una pierna", target:"2×10/pierna", mode:"unilateral", note:"Activación, no fatiga. Peso corporal (0 kg), pausa de 1 s arriba."},
@@ -606,7 +606,7 @@ const PLANS = { borja: {
           {id:"f5_lu_5", name:"Curl martillo con mancuernas", target:"2×10 · descanso 60 s", note:"Peso total con el que 10 reps te dejen 2 de reserva; con 20 kg totales hacías 20-30 reps por serie, así que sube la carga."},
           {id:"f1_lu_5", name:"Plancha", target:"2×40 s", mode:"time", note:"Anota los segundos totales."},
         ]},
-      { day:"Martes", name:"Carrera con toques de ritmo", dur:"30-35 min", focus:"10 min fácil + 4×3 min al ritmo que llevarás en los tramos llanos de carrera (5:40-5:50 min/km, o por esfuerzo si hay cuesta; no bajes de 5:35, en los bloques sueles pasarte de ritmo) con 2 min de trote entre bloques + 6 min fácil. Tiene que salir fácil: si pierdes el ritmo, no lo fuerces.", simple:true },
+      { swim:true, day:"Martes", name:"Carrera con toques de ritmo", dur:"30-35 min", focus:"10 min fácil + 4×3 min al ritmo que llevarás en los tramos llanos de carrera (5:40-5:50 min/km, o por esfuerzo si hay cuesta; no bajes de 5:35, en los bloques sueles pasarte de ritmo) con 2 min de trote entre bloques + 6 min fácil. Tiene que salir fácil: si pierdes el ritmo, no lo fuerces. Si nadas por la mañana, esto va por la tarde con 5-6 h de margen; si llegas con piernas o hombros cargados de la piscina, cambia los bloques por rodaje suave.", simple:true },
       { day:"Miércoles", name:"Fuerza mínima de torso + core", dur:"30 min", focus:"Solo para mantener el tacto, sin cargar piernas. RPE 6.",
         exercises:[
           {id:"f3_mi_3", name:"Press militar", target:"2×6 @ RPE 6 · descanso 90 s", note:"35 kg (lo que moviste el 16 y el 23/9); solo 40 kg si sube rápido. Total: 12 reps."},
@@ -616,7 +616,7 @@ const PLANS = { borja: {
           {id:"f4_lu_6", name:"Pallof press (goma o polea)", target:"2×10/lado · descanso 45 s", mode:"unilateral", note:"Pausa de 2 s con los brazos estirados."},
           {id:"f4_vi_3", name:"Elevación de talones a una pierna", target:"2×10/pierna · bajada de 3 s", mode:"unilateral", note:"Tobillo y gemelo, sin carga extra. Te doblaste el tobillo el 19/9 y el terreno del domingo será irregular. Apóyate en la pared si hace falta."},
         ]},
-      { day:"Jueves", name:"Carrera suave + progresivos", dur:"25-30 min", focus:"20 min muy fácil a 5:50-6:30 min/km + 4 progresivos de 20 s (acelera sin sprintar) con 40 s andando entre ellos.", simple:true },
+      { swim:true, day:"Jueves", name:"Carrera suave + progresivos", dur:"25-30 min", focus:"20 min muy fácil a 5:50-6:30 min/km + 4 progresivos de 20 s (acelera sin sprintar) con 40 s andando entre ellos. La natación de la mañana no cambia esto; si la clase se ha hecho larga o notas las piernas pesadas, quita los progresivos y deja solo el rodaje.", simple:true },
       { day:"Viernes", name:"Descanso + movilidad", dur:"15-20 min", focus:"Descanso real. 10-15 min de movilidad suave con 5 min de tobillo (círculos y equilibrio a una pierna), hidrátate, deja preparado el dorsal, la ropa y los geles, y acuéstate temprano.", simple:true },
       { day:"Sábado", name:"Carrera suave (shakeout)", dur:"15-20 min", focus:"3-4 km muy suaves + 4 progresivos de 20 s. Solo para soltar las piernas; termina con ganas de más.", simple:true },
       { day:"Domingo", name:"🏁 Carrera Trail 15K (+500 m D+)", dur:"≈1:30-1:50 h", focus:"Salida a las 9:00. Los primeros 3 km, 10-15 s/km más lento de lo que pida el cuerpo. Camina las cuestas duras desde el principio: con +500 m en 15 km, el desnivel pesa más que la distancia. Bebe a sorbos en cada avituallamiento y, si lo has probado antes, un gel hacia el minuto 40-45. Anota tiempo y sensaciones abajo.", simple:true },
@@ -1174,12 +1174,12 @@ async function renderWeek(){
       <div class="day-left">
         <span class="day-icon">${dayIcon(d)}</span>
         <div>
-          <div class="day-name" id="dayname_${i}">${d.day} · ${d.name}</div>
+          <div class="day-name" id="dayname_${i}">${d.day} · ${d.name}${d.swim?' · 🏊':''}</div>
           <div class="day-focus">${focusText}</div>
         </div>
       </div>
       <div class="day-right">
-        <span class="day-dur">${d.dur}</span>
+        <span class="day-dur">${d.swim?'🏊 45 min + ':''}${d.dur}</span>
         ${i===todayIdx && currentDate===todayStr() ? '<div class="today-dot"></div>' : ''}
         <div class="check-badge" id="badge_${currentPhase}_${i}"></div>
       </div>`;
@@ -1265,7 +1265,113 @@ function dateForWeekIdx(idx){
   return toLocalISO(d);
 }
 
+
 async function renderDayBody(d, idx){
+  await renderDayBodyCore(d, idx);
+  if(d.swim) await renderSwimBlock(d, idx);
+}
+
+async function lastSwimPool(){
+  try{
+    const all = await collectAllLogs();
+    for(const {log} of all){
+      for(const [k,v] of Object.entries(log)){
+        if(k.startsWith('swim_') && v && v.piscina) return v.piscina;
+      }
+    }
+  }catch(e){}
+  return '25';
+}
+
+async function renderSwimBlock(d, idx){
+  const body = document.getElementById(`body_${currentPhase}_${idx}`);
+  if(!body) return;
+  const old = body.querySelector('.swim-block');
+  if(old) old.remove();
+  const dateKey = dateForWeekIdx(idx);
+  const log = await loadLog(dateKey);
+  const key = `swim_p${currentPhase}_d${idx}`;
+  const e = log[key] || {};
+  const pool = e.piscina || await lastSwimPool();
+  const wrap = document.createElement('div');
+  wrap.className = 'swim-block exercise';
+  wrap.style.cssText = 'border:1px solid var(--accent); margin-bottom:12px;';
+  wrap.innerHTML = `
+    <div class="ex-top">
+      <div>
+        <div class="ex-name">🏊 Natación · clase de técnica (mañana)</div>
+        <div class="ex-target">45 min · sin objetivos, solo registro</div>
+        <div class="ex-note">Es independiente de la sesión de abajo: puedes hacer esa por la tarde igualmente. Anota cómo llegas (hombros, piernas) y ajusto el resto.</div>
+      </div>
+      <div class="ex-check ${e.done?'done':''}" id="swimCheck_${idx}">${e.done?'✓':''}</div>
+    </div>
+    <div class="ex-inputs">
+      <div style="flex:1"><label>Largos (1 longitud = 1)</label><input type="number" inputmode="numeric" placeholder="—" id="swimLargos_${idx}" value="${e.largos||''}"></div>
+      <div style="flex:1"><label>Piscina (m)</label><input type="number" inputmode="decimal" id="swimPiscina_${idx}" value="${pool}"></div>
+      <div style="flex:1"><label>Esfuerzo (1-10)</label><input type="number" inputmode="numeric" min="1" max="10" placeholder="—" id="swimRpe_${idx}" value="${e.rpe||''}"></div>
+    </div>
+    <div class="ex-target" id="swimMetros_${idx}" style="margin-top:6px;"></div>
+    <div class="comment-box">
+      <label>Qué se ha trabajado y sensaciones</label>
+      <textarea id="swimNota_${idx}" placeholder="Estilo, ejercicio técnico, respiración... y cómo quedan hombros/espalda/piernas">${e.nota||''}</textarea>
+    </div>
+    <div class="save-row"><button class="save-btn" id="swimSave_${idx}">Guardar natación</button><div class="saved-note" id="swimSaved_${idx}">Guardado</div></div>`;
+  body.insertBefore(wrap, body.firstChild);
+
+  const largosEl = wrap.querySelector(`#swimLargos_${idx}`);
+  const poolEl = wrap.querySelector(`#swimPiscina_${idx}`);
+  const metrosEl = wrap.querySelector(`#swimMetros_${idx}`);
+  const updMetros = ()=>{
+    const l = parseFloat(largosEl.value), p = parseFloat(poolEl.value);
+    metrosEl.textContent = (!isNaN(l) && !isNaN(p)) ? `≈ ${Math.round(l*p)} m` : '';
+  };
+  largosEl.oninput = updMetros; poolEl.oninput = updMetros; updMetros();
+
+  const chk = wrap.querySelector(`#swimCheck_${idx}`);
+  chk.onclick = ()=>{
+    chk.classList.toggle('done');
+    chk.textContent = chk.classList.contains('done') ? '✓' : '';
+  };
+  wrap.querySelector(`#swimSave_${idx}`).onclick = async ()=>{
+    const note = wrap.querySelector(`#swimSaved_${idx}`);
+    try{
+      const l = await loadLog(dateKey);
+      const largos = largosEl.value;
+      l[key] = {
+        done: chk.classList.contains('done') || !!largos,
+        largos: largos,
+        piscina: poolEl.value,
+        rpe: wrap.querySelector(`#swimRpe_${idx}`).value,
+        nota: wrap.querySelector(`#swimNota_${idx}`).value.trim(),
+      };
+      await saveLog(dateKey, l);
+      if(l[key].done){ chk.classList.add('done'); chk.textContent = '✓'; }
+      note.textContent = 'Guardado';
+      note.style.color = 'var(--green)';
+      note.style.display = 'block';
+      setTimeout(()=>{ note.style.display = 'none'; }, 1800);
+      renderSummary();
+    }catch(err){
+      console.error('Error guardando natación', err);
+      note.textContent = '⚠️ No se pudo guardar. Prueba a recargar la app.';
+      note.style.color = 'var(--red)';
+      note.style.display = 'block';
+    }
+  };
+}
+
+function swimText(val){
+  const parts = [];
+  if(val.largos){
+    const m = (parseFloat(val.largos) && parseFloat(val.piscina)) ? ` (≈${Math.round(parseFloat(val.largos)*parseFloat(val.piscina))} m)` : '';
+    parts.push(`${val.largos} largos${val.piscina ? ' de '+val.piscina+' m' : ''}${m}`);
+  } else if(val.done){ parts.push('hecha'); }
+  if(val.rpe) parts.push(`esfuerzo ${val.rpe}/10`);
+  if(val.nota) parts.push(`"${val.nota}"`);
+  return parts.join(' · ');
+}
+
+async function renderDayBodyCore(d, idx){
   const body = document.getElementById(`body_${currentPhase}_${idx}`);
   const dateKey = dateForWeekIdx(idx);
   const log = await loadLog(dateKey);
@@ -1755,7 +1861,7 @@ async function buildExerciseSeries(){
   const byName = {};
   chrono.forEach(({dateKey, log})=>{
     Object.entries(log).forEach(([key,val])=>{
-      if(key.startsWith('customlist_') || key.startsWith('comment_')) return;
+      if(key.startsWith('customlist_') || key.startsWith('comment_') || key.startsWith('swim_')) return;
       if(key.startsWith('p') && key.includes('_d')) return;
       if(!val || typeof val !== 'object') return;
       const mode = exModeFromId(key);
@@ -2177,6 +2283,8 @@ async function renderHistory(){
         if(key.startsWith('customlist_')) return;
         if(key.startsWith('comment_')){
           if(val && val.trim()) lines += `<div class="hist-line"><span style="font-style:italic;">"${val}"</span><span></span></div>`;
+        } else if(key.startsWith('swim_')){
+          if(val && (val.done || hasLoggedValue(val))) lines += `<div class="hist-line"><span>🏊 Natación</span><span>${swimText(val)}</span></div>`;
         } else if(key.startsWith('stretch_')){
           if(val && val.done) lines += `<div class="hist-line"><span>Estiramientos</span><span>✓</span></div>`;
         } else if(key.startsWith('p') && key.includes('_d')){
@@ -2233,6 +2341,8 @@ async function buildExportText(all){
       if(key.startsWith('customlist_')) return;
       if(key.startsWith('comment_')){
         if(val && val.trim()) out += `  Comentario: ${val}\n`;
+      } else if(key.startsWith('swim_')){
+        out += `  Natación (clase técnica, 45 min): ${swimText(val)}\n`;
       } else if(key.startsWith('stretch_')){
         if(val.done) out += `  Estiramientos: hechos\n`;
       } else if(key.startsWith('p') && key.includes('_d')){
