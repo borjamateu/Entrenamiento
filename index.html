@@ -54,9 +54,9 @@
   .delta-down{color:var(--green);}
   .delta-up{color:var(--red);}
 
-  .phase-row{display:flex; gap:8px; padding:16px 16px 0;}
+  .phase-row{display:flex; gap:8px; padding:16px 16px 0; overflow-x:auto; -webkit-overflow-scrolling:touch;}
   .phase-btn{
-    flex:1; padding:10px 4px; text-align:center; border-radius:11px;
+    flex:1 0 auto; min-width:56px; padding:10px 8px; text-align:center; border-radius:11px;
     border:0.5px solid var(--border); background:var(--card); color:var(--text2);
     font-size:13px; font-weight:600; transition:all .15s ease;
   }
@@ -620,6 +620,82 @@ const PLANS = { borja: {
       { day:"Viernes", name:"Descanso + movilidad", dur:"15-20 min", focus:"Descanso real. 10-15 min de movilidad suave con 5 min de tobillo (círculos y equilibrio a una pierna), hidrátate, deja preparado el dorsal, la ropa y los geles, y acuéstate temprano.", simple:true },
       { day:"Sábado", name:"Carrera suave (shakeout)", dur:"15-20 min", focus:"3-4 km muy suaves + 4 progresivos de 20 s. Solo para soltar las piernas; termina con ganas de más.", simple:true },
       { day:"Domingo", name:"🏁 Carrera Trail 15K (+500 m D+)", dur:"≈1:30-1:50 h", focus:"Salida a las 9:00. Los primeros 3 km, 10-15 s/km más lento de lo que pida el cuerpo. Camina las cuestas duras desde el principio: con +500 m en 15 km, el desnivel pesa más que la distancia. Bebe a sorbos en cada avituallamiento y, si lo has probado antes, un gel hacia el minuto 40-45. Anota tiempo y sensaciones abajo.", simple:true },
+    ]
+  },
+  6: {
+    label: "Fase 6 · Post-carrera (semana de recuperación)",
+    days: [
+      { day:"Lunes", name:"Descanso activo", dur:"20-30 min", focus:"Tras los 15 km con +500 m D+, hoy no se entrena. Paseo o bici muy suave y movilidad de cadera y tobillo. Si tienes agujetas fuertes, solo paseo.", simple:true },
+      { swim:true, day:"Martes", name:"Bici o paseo suave", dur:"30 min", focus:"Nada de carrera. Bici o caminata a esfuerzo muy bajo (RPE 3). La natación de la mañana es la parte útil del día: nada suave y aprovecha para soltar piernas.", simple:true },
+      { day:"Miércoles", name:"Fuerza ligera full body", dur:"40 min", focus:"Reintroducción: RPE 5-6, sin fallo y con menos series. Tres días después de la carrera las piernas todavía están cargadas, así que técnica y control. Anota peso total y reps totales.",
+        exercises:[
+          {id:"f3_lu_1", name:"Sentadilla trasera", target:"3×6 @ RPE 5 · descanso 2 min", note:"Salida 50 kg, bajando más lento de lo habitual. Total: 18 reps."},
+          {id:"f3_mi_1", name:"Press banca", target:"3×8 @ RPE 6 · descanso 90 s", note:"Salida 55 kg. Total: 24 reps."},
+          {id:"f1_lu_3", name:"Remo con barra", target:"3×8 · descanso 90 s", note:"Salida 35-40 kg. Total: 24 reps."},
+          {id:"f6_mi_4", name:"Curl con barra EZ", target:"3×10 · descanso 60 s", note:"Peso con el que 10 reps te dejen 2 de reserva. Sin balanceo."},
+          {id:"f1_lu_5", name:"Plancha", target:"3×40 s", mode:"time", note:"Anota los segundos totales."},
+          {id:"f4_mi_7", name:"Comba (finisher)", target:"4 min: 30 s salto / 30 s descanso", mode:"time", note:"Salto bajo y suave, sin dobles. Si el tobillo o el gemelo molestan, sáltatela."},
+        ]},
+      { swim:true, day:"Jueves", name:"Primera carrera suave", dur:"25-30 min", focus:"25 min a 6:15-6:45 min/km, Z1-Z2, terreno llano. Si las piernas no están, cámbiala por bici. Sin progresivos.", simple:true },
+      { day:"Viernes", name:"WOD ligero de reintroducción", dur:"20-25 min", focus:"AMRAP 15 min a RPE 6, sin saltos ni impacto: 10 swings de kettlebell · 8 flexiones · 12 air squats · 8 remos con mancuerna por lado. Mantén el mismo ritmo cada ronda, no el de la primera. Anota rondas completas y peso de la kettlebell en el comentario.", simple:true },
+      { day:"Sábado", name:"Carrera fácil", dur:"40-50 min", focus:"40-45 min a 6:00-6:30 min/km, llano o cuesta suave. Es la mitad de tu tirada habitual: la meta es soltar piernas, no rendir. Anota sensaciones de piernas y tobillo.", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad, paseo o bici suave. Mañana empieza el bloque híbrido.", simple:true },
+    ]
+  },
+  7: {
+    label: "Fase 7 · Bloque híbrido 1 (12-25/10)",
+    days: [
+      { day:"Lunes", name:"Fuerza A (pierna)", dur:"50-55 min", focus:"RPE 7, sin fallo. Es la fase para volver a subir carga tras la recuperación. Anota peso total y reps totales.",
+        exercises:[
+          {id:"f3_lu_1", name:"Sentadilla trasera", target:"4×6 @ RPE 7 · descanso 2-3 min", note:"Empieza con 55-60 kg. Sube 2,5 kg cuando las 4 series salgan limpias. Total: 24 reps."},
+          {id:"f3_lu_2", name:"Peso muerto rumano", target:"3×8 · bajada de 3 s · descanso 90 s", note:"Total: 24 reps."},
+          {id:"f3_lu_3", name:"Zancadas búlgaras", target:"3×8/pierna · descanso 90 s", mode:"unilateral", note:"Peso de la mancuerna individual; con 0 kg, peso corporal."},
+          {id:"f2_mi_3", name:"Hip thrust", target:"3×10 · descanso 90 s", note:"Pausa de 1 s arriba. Total: 30 reps."},
+          {id:"f4_mi_7", name:"Comba (finisher)", target:"6 min: 40 s salto / 20 s descanso", mode:"time", note:"Anota los segundos totales de salto."},
+        ]},
+      { swim:true, day:"Martes", name:"Carrera de intervalos cortos", dur:"35-40 min", focus:"10 min fácil + 6×2 min a RPE 8 (duro pero sostenible) con 2 min de trote entre bloques + 8 min fácil. La natación va por la mañana; si llegas con las piernas cargadas, cambia los intervalos por 30 min Z2.", simple:true },
+      { day:"Miércoles", name:"Fuerza B (torso + brazos)", dur:"50-55 min", focus:"RPE 7, sin fallo. Los brazos ya no son un final de sesión con series de 20 reps: peso con el que 10 te dejen 2 de reserva.",
+        exercises:[
+          {id:"f3_mi_1", name:"Press banca", target:"4×6 @ RPE 7 · descanso 2 min", note:"Total: 24 reps."},
+          {id:"f3_mi_2", name:"Dominadas lastradas", target:"4×4-5 · descanso 2 min", note:"Estrictas, con goma si no sale la 4ª. Total: 16-20 reps."},
+          {id:"f3_mi_3", name:"Press militar", target:"3×6 @ RPE 7 · descanso 2 min", note:"Total: 18 reps."},
+          {id:"f1_lu_3", name:"Remo con barra", target:"3×8 · descanso 90 s", note:"Total: 24 reps."},
+          {id:"f7_mi_5", name:"Curl con barra EZ", target:"3×8-10 · descanso 60 s", note:"Agarre estrecho, sin balanceo. Total: 24-30 reps."},
+          {id:"f5_lu_5", name:"Curl martillo con mancuernas", target:"3×10 · descanso 60 s", note:"Peso total de las dos mancuernas."},
+          {id:"f4_mi_6", name:"Extensión de tríceps sobre la cabeza", target:"3×12 · descanso 60 s", note:"Codos cerrados."},
+        ]},
+      { swim:true, day:"Jueves", name:"Carrera suave + kettlebell", dur:"40 min", focus:"25 min Z2 a 5:50-6:20 min/km. Después, 10 min de kettlebell: 5 rondas de 8 swings a dos manos + 4 cleans por lado + 30 s plancha. Peso ligero, técnica limpia. Anota el peso de la kettlebell en el comentario.", simple:true },
+      { day:"Viernes", name:"WOD CrossFit", dur:"25-30 min", focus:"Semana del 12/10 (WOD el 16/10): estilo Cindy, AMRAP 20 min de 5 dominadas (o 10 remos en polea si no salen) · 10 flexiones · 15 air squats. Semana del 19/10 (WOD el 23/10): chipper for time con tope de 25 min, 30-20-10 de air squats · swings de kettlebell · sit-ups. Anota rondas o tiempo, y el peso de la kettlebell, en el comentario.", simple:true },
+      { day:"Sábado", name:"Carrera larga con cuestas", dur:"60-75 min", focus:"Semana del 12/10: 10 km. Semana del 19/10: 12 km. Ritmo 5:50-6:20 min/km en llano, camina las cuestas fuertes. Anota distancia, desnivel positivo y sensaciones (tobillo incluido) en el comentario.", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad, paseo o bici suave.", simple:true },
+    ]
+  },
+  8: {
+    label: "Fase 8 · Bloque híbrido 2 (26/10-8/11)",
+    days: [
+      { day:"Lunes", name:"Fuerza A (pierna, variantes)", dur:"50-55 min", focus:"Mismos patrones que la Fase 7, con otros ejercicios para no repetir. RPE 7, sin fallo.",
+        exercises:[
+          {id:"f1_vi_1", name:"Sentadilla frontal / goblet", target:"4×6 @ RPE 7 · descanso 2 min", note:"Con barra si te sale limpia; si no, goblet con mancuerna. Pausa de 1 s abajo. Total: 24 reps."},
+          {id:"f2_mi_1", name:"Peso muerto convencional", target:"4×5 @ RPE 7 · descanso 2-3 min", note:"Empieza en 60 kg. Total: 20 reps."},
+          {id:"f8_lu_3", name:"Step-ups con mancuernas", target:"3×8/pierna · descanso 90 s", mode:"unilateral", note:"Cajón o banco a la altura de la rodilla. Peso de la mancuerna individual; controla la bajada."},
+          {id:"f8_lu_4", name:"Curl femoral (máquina o con balón)", target:"3×10 · descanso 60 s", note:"Si no tienes máquina, curl con balón o deslizamiento de isquios."},
+          {id:"f4_mi_7", name:"Comba (finisher)", target:"8 min: 30 s salto rápido / 30 s descanso", mode:"time", note:"Anota los segundos totales de salto."},
+        ]},
+      { swim:true, day:"Martes", name:"Carrera de umbral", dur:"40-45 min", focus:"10 min fácil + 3×8 min a ritmo tempo (RPE 7, ~5:15-5:30 min/km) con 2 min de trote entre bloques + 8 min fácil. Si llegas cargado de la piscina, cámbialo por 30 min Z2.", simple:true },
+      { day:"Miércoles", name:"Fuerza B (torso + brazos, variantes)", dur:"50-55 min", focus:"RPE 7, sin fallo. Cambia el press y el tipo de curl respecto a la Fase 7.",
+        exercises:[
+          {id:"f1_vi_2", name:"Press inclinado mancuernas", target:"4×8 @ RPE 7 · descanso 90 s", note:"Peso individual de cada mancuerna. Total: 32 reps."},
+          {id:"f3_mi_2", name:"Dominadas lastradas", target:"4×5 · descanso 2 min", note:"Total: 20 reps."},
+          {id:"f1_mi_2", name:"Press militar mancuernas", target:"3×8 · descanso 90 s", note:"Sentado o de pie, peso individual."},
+          {id:"f8_mi_4", name:"Remo Pendlay", target:"4×6 · descanso 90 s", note:"Barra desde el suelo en cada repetición, espalda plana. Total: 24 reps."},
+          {id:"f8_mi_5", name:"Curl inclinado con mancuernas", target:"3×10 · descanso 60 s", note:"Banco a 45°, brazos colgando. Peso individual de cada mancuerna."},
+          {id:"f8_mi_6", name:"Curl concentrado", target:"2×12/lado · descanso 45 s", mode:"unilateral", note:"Apoya el codo en el muslo, sin balanceo."},
+          {id:"f8_mi_7", name:"Extensión de tríceps en polea", target:"3×12 · descanso 60 s", note:"Con cuerda o barra recta, codos pegados."},
+        ]},
+      { swim:true, day:"Jueves", name:"Carrera suave + core", dur:"40 min", focus:"25 min Z2 a 5:50-6:20 min/km. Después 3 rondas de 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof press por lado · 10 farmer carry (peso a tu elección).", simple:true },
+      { day:"Viernes", name:"WOD CrossFit", dur:"25-35 min", focus:"Semana del 26/10 (WOD el 30/10): estilo Helen, 3 rondas for time de 400 m de carrera · 21 swings de kettlebell · 12 remos en polea o dominadas asistidas. Semana del 2/11 (WOD el 6/11): EMOM 24 min, 6 vueltas de 4 estaciones: min1 12 goblet squats · min2 10 press de mancuernas alternos · min3 12 remos con mancuerna · min4 40 s de comba. Anota tiempo o rondas y los pesos en el comentario.", simple:true },
+      { day:"Sábado", name:"Carrera larga con cuestas", dur:"70-85 min", focus:"Semana del 26/10: 12 km. Semana del 2/11: 14 km. Ritmo 5:50-6:20 min/km en llano, camina las cuestas fuertes. Anota distancia, desnivel positivo y sensaciones en el comentario.", simple:true },
+      { day:"Domingo", name:"Recuperación activa", dur:"20-30 min", focus:"Movilidad, paseo o bici suave.", simple:true },
     ]
   }
 },
