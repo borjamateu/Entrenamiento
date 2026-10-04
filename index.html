@@ -360,7 +360,7 @@
 
 <header>
   <h1>Plan de entrenamiento</h1>
-  <p class="sub" id="subtitle">Fuerza + carrera + base CrossFit</p>
+  <p class="sub" id="subtitle">Fuerza + carrera</p>
   <div class="streak-pill" id="streakPill" style="display:none;"></div>
 </header>
 
@@ -477,7 +477,8 @@ if('serviceWorker' in navigator){
   });
 }
 
-const PLANS = { borja: {
+/* Planes anteriores (ya no se muestran): solo sirven para reconocer ejercicios en el historial y las gráficas */
+const LEGACY_PLANS = { borja: {
   1: {
     label: "Fase 1 · Reacondicionamiento",
     days: [
@@ -783,24 +784,249 @@ tati: {
 }
 };
 
-const RACE_DATE = '2026-10-04';
-const RACE_TARGET = { borja: '15 km · +500 m', tati: '8 km · +200 m' };
+/* ---------- PLAN VIGENTE: 6 semanas (5/10 → 15/11/2026), test el sábado 14/11 ---------- */
+const FIRST_PHASE = 10;
+const PLAN_START = '2026-10-05';
+const WEEK_RANGES = ['5-11/10','12-18/10','19-25/10','26/10-1/11','2-8/11','9-15/11'];
+const WEEK_TITLES = ['Asimilación','Carga','Carga + test 5K','Descarga','Pico','Test 10K'];
+
+function E(id, name, target, note, mode){
+  const o = { id, name, target };
+  if(note) o.note = note;
+  if(mode) o.mode = mode;
+  return o;
+}
+function fase(n, days){
+  return { short:'S'+(n+1), label:`Semana ${n+1} · ${WEEK_TITLES[n]} (${WEEK_RANGES[n]})`, days };
+}
+
+/* ---------- BORJA ---------- */
+function borjaUpper(n){
+  const light = (n===3 || n===5);
+  const peak = (n===4);
+  const t = light
+    ? { banca:'3×6 @ RPE 6 · descanso 2 min', remo:'3×8 · descanso 90 s', mil:'3×6 @ RPE 6 · descanso 2 min', dom:'3×3-4 estrictas · descanso 2 min', fond:'2×8 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'2×10 · descanso 60 s' }
+    : peak
+    ? { banca:'4×5 @ RPE 8 · descanso 2-3 min', remo:'4×6 · descanso 90 s', mil:'4×5 @ RPE 8 · descanso 2-3 min', dom:'4×4-5 estrictas · descanso 2 min', fond:'3×10 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'3×8 · descanso 60 s' }
+    : { banca:'4×6 @ RPE 7 · descanso 2 min', remo:'4×8 · descanso 90 s', mil:'4×6 @ RPE 7 · descanso 2 min', dom:'4×3-4 estrictas · descanso 2 min', fond:'3×8 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'3×10 · descanso 60 s' };
+  const first = (n===0);
+  return { day:'Lunes', name: light ? 'Fuerza tren superior (ligera)' : 'Fuerza tren superior', dur:'50-60 min',
+    focus: n===0 ? 'Semana de asimilación tras la carrera: el tren superior está fresco, aprovecha. Deja 1-2 reps en reserva en cada serie.'
+         : n===3 ? 'Descarga: mismas cargas que la semana pasada, menos series.'
+         : n===5 ? 'Semana de test: mantén la carga, quita series. El sábado es lo importante.'
+         : 'Si la semana pasada completaste todas las reps limpias, sube 2,5 kg. Deja 1-2 reps en reserva.',
+    exercises:[
+      E('b_lu_banca','Press banca', t.banca, first ? 'Parte de ~60 kg [estimación] (tu marca: 55 kg el 16/9). Anota peso total y reps totales.' : 'Anota peso total y reps totales.'),
+      E('b_lu_remo','Remo con barra', t.remo, first ? 'Parte de ~30 kg [estimación]. Espalda plana.' : null),
+      E('b_lu_mil','Press militar', t.mil, first ? 'Parte de ~40 kg [estimación] (tu marca: 35 kg el 30/9).' : null),
+      E('b_lu_dom','Dominadas lastradas', t.dom, '0 kg = peso corporal. Estrictas: sin balanceo.'),
+      E('b_lu_fond','Fondos en paralelas', t.fond, '0 kg = peso corporal.'),
+      E('b_lu_face','Face pull', t.face, null),
+      E('b_lu_curl','Curl martillo con mancuernas', t.curl, 'Peso total de las dos mancuernas.'),
+      E('b_lu_comba','Comba (finisher)', '5 min continuos', 'Anota los segundos totales de salto.', 'time'),
+    ]};
+}
+
+function borjaLegs(n){
+  let ex, focus, name = 'Fuerza pierna pesada', dur = '55-60 min';
+  if(n===0){
+    name = 'Fuerza pierna (moderada)'; dur = '50-55 min';
+    focus = 'Semana de asimilación: carga moderada, técnica limpia, sin llegar al fallo. Hoy es la primera sesión de pierna tras +500 m de desnivel.';
+    ex = [
+      E('b_mi_sent','Sentadilla trasera','4×5 @ RPE 6 · descanso 2 min','Parte de ~55 kg [estimación]. Anota peso total y reps totales (20).'),
+      E('b_mi_rdl','Peso muerto rumano','3×8 · bajada de 3 s · descanso 90 s','Parte de ~50 kg [estimación].'),
+      E('b_mi_bulg','Zancadas búlgaras','3×8/pierna · descanso 90 s','Peso de cada mancuerna; ~10 kg [estimación].','unilateral'),
+      E('b_mi_talon','Elevación de talones a una pierna','3×12/pierna · descanso 60 s','Con mancuerna si te sobra.','unilateral'),
+      E('b_mi_plank','Plancha','3×45 s','Segundos totales.','time'),
+    ];
+  } else if(n===3){
+    name = 'Fuerza pierna (descarga)'; dur = '45-50 min';
+    focus = 'Descarga: misma técnica, 20 % menos carga y menos series. Sin saltos.';
+    ex = [
+      E('b_mi_sent','Sentadilla trasera','3×5 @ RPE 6 · descanso 2 min','Usa el peso de la semana 2.'),
+      E('b_mi_rdl','Peso muerto rumano','2×8 · bajada de 3 s · descanso 90 s',null),
+      E('b_mi_step','Step-ups con mancuernas','3×8/pierna · descanso 90 s','Peso de cada mancuerna; baja un 20 % respecto a la semana pasada.','unilateral'),
+      E('b_mi_talon','Elevación de talones a una pierna','3×12/pierna · descanso 60 s',null,'unilateral'),
+      E('b_mi_plank','Plancha','3×45 s','Segundos totales.','time'),
+    ];
+  } else if(n===5){
+    name = 'Fuerza pierna (ligera pre-test)'; dur = '35-40 min';
+    focus = 'El sábado es el test de 10K: hoy solo activar. Velocidad de barra, sin fatiga, sin agujetas.';
+    ex = [
+      E('b_mi_sent','Sentadilla trasera','3×4 @ RPE 6 · descanso 2 min','Ligero y rápido. Anota peso total y reps totales (12).'),
+      E('b_mi_rdl','Peso muerto rumano','2×6 · descanso 90 s',null),
+      E('b_mi_talon','Elevación de talones a una pierna','2×12/pierna · descanso 60 s',null,'unilateral'),
+      E('b_mi_plank','Plancha','3×40 s','Segundos totales.','time'),
+    ];
+  } else {
+    const peak = (n===4);
+    focus = peak
+      ? 'Semana de pico: la sentadilla sube a RPE 8. Si el martes de cuestas te dejó las piernas muy cargadas, baja a 4 series.'
+      : 'Sube 2,5 kg en sentadilla si las 5 series de la semana pasada salieron limpias. Step-ups y búlgaras son lo más parecido a una subida de montaña.';
+    ex = [
+      E('b_mi_sent','Sentadilla trasera', peak ? '5×5 @ RPE 8 · descanso 2-3 min' : '5×5 @ RPE 7 · descanso 2-3 min', n===1 ? 'Parte de 60 kg [estimación]. Anota peso total y reps totales (25).' : 'Anota peso total y reps totales (25).'),
+      E('b_mi_step','Step-ups con mancuernas','4×8/pierna · descanso 90 s', n===1 ? 'Cajón o banco a la altura de la rodilla; ~12 kg por mano [estimación]. Controla la bajada.' : 'Controla la bajada.','unilateral'),
+      E('b_mi_bulg','Zancadas búlgaras','3×8/pierna · descanso 90 s', n===1 ? '~14 kg por mano [estimación].' : null,'unilateral'),
+      E('b_mi_rdl','Peso muerto rumano','3×8 · bajada de 3 s · descanso 90 s', n===1 ? 'Parte de ~55 kg [estimación].' : null),
+      E('b_mi_salto','Saltos al cajón','4×5 · descanso 60 s','Altura cómoda, baja andando. Calidad sobre cantidad.'),
+      E('b_mi_talon','Elevación de talones a una pierna','3×15/pierna · descanso 60 s','Con mancuerna.','unilateral'),
+    ];
+  }
+  return { day:'Miércoles', name, dur, focus, exercises: ex };
+}
+
+const BORJA_TUE = [
+  { name:'Carrera con cuestas', dur:'35-40 min', focus:'4 km fáciles (5:50-6:30 min/km) + 6 strides de 10 s en cuesta, rápidos y sueltos, bajando andando. Primer contacto con la cuesta, sin fatiga.' },
+  { name:'Carrera con cuestas', dur:'40-45 min', focus:'15 min fácil + 8×45 s en cuesta (6-10 %) a RPE 8, bajando trotando suave + 10 min fácil. Zancada corta y brazos activos.' },
+  { name:'Carrera con cuestas', dur:'45-50 min', focus:'15 min fácil + 6×2 min en cuesta a RPE 8, bajando trotando + 10 min fácil. Si te pasas de umbral, camina rápido (manos en los muslos) el tramo final: es parte del entrenamiento.' },
+  { name:'Carrera con cuestas', dur:'35-40 min', focus:'Descarga: 15 min fácil + 5×1 min en cuesta a RPE 8 + 10 min fácil. No añadas repeticiones.' },
+  { name:'Carrera con cuestas', dur:'50-55 min', focus:'15 min fácil + 5×3 min en cuesta a RPE 8-9, el último de cada serie a tope, bajando trotando + 10 min fácil. Camina rápido lo que no puedas correr sin pasarte del umbral.' },
+  { name:'Carrera de activación', dur:'30-35 min', focus:'4 km fáciles + 6×1 min en cuesta a RPE 7 (sin ir a tope) + 4 strides. Solo activar piernas para el test del sábado.' },
+];
+const BORJA_THU = [
+  { name:'Carrera suave + core', dur:'40 min', focus:'25 min fáciles a 5:50-6:30 min/km. Después, core: 3 rondas de 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof press por lado.' },
+  { name:'Carrera de series (llano)', dur:'45-50 min', focus:'15 min fácil + 6×400 m a ~4:40 min/km (rec. 90 s trote) + 10 min fácil. Ritmos orientativos: los ajusto con tus registros.' },
+  { name:'Carrera test 5K', dur:'45 min', focus:'15 min fácil + 4 strides y 5 km en llano a tope controlado. Objetivo ≤25:30 (5:06 min/km) [estimación]: salida a ~5:10, no más rápido. Este dato decide si seguimos con la meta de 52:00 en el 10K o la ajustamos a 53:00. Anota tiempo y pulsaciones.' },
+  { name:'Carrera de series (llano)', dur:'40-45 min', focus:'Descarga: 15 min fácil + 4×400 m a ~4:40 min/km (rec. 90 s trote) + 10 min fácil.' },
+  { name:'Carrera de series (llano)', dur:'50-55 min', focus:'15 min fácil + 5×1 km a ~5:00 min/km (rec. 2 min trote) + 10 min fácil. Si la tercera repetición ya se te va de ritmo, termina con 4.' },
+  { name:'Carrera de series (llano)', dur:'40 min', focus:'15 min fácil + 4×1 min a ~4:50 min/km (rec. 1 min 30 s) + 10 min fácil. Afinar, no entrenar: sin pasarte.' },
+];
+const BORJA_WOD = [
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'AMRAP 15 min: 5 dominadas (o 8 remos con mancuerna por lado) · 10 flexiones · 12 sit-ups · plancha 20 s. Sin piernas: mañana toca tirada. Anota rondas.' },
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'EMOM 20 min, 5 vueltas de 4 estaciones: min1 10 press de mancuernas alternos · min2 8 remos con mancuerna por lado · min3 12 flexiones · min4 40 s de plancha. Anota pesos.' },
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'5 rondas for time (tope 20 min): 5 dominadas (o 10 remos) · 10 fondos · 15 sit-ups. Sin piernas. Anota el tiempo.' },
+  { name:'WOD tren superior y core', dur:'20-25 min', focus:'Descarga. AMRAP 12 min: 8 flexiones · 8 remos con mancuerna por lado · 10 sit-ups. Anota rondas.' },
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'For time (tope 20 min): 30-20-10 de flexiones · remos con mancuerna (por lado) · sit-ups. Sin piernas. Anota el tiempo y los pesos.' },
+  { name:'Recuperación activa · movilidad y core', dur:'20 min', focus:'Víspera del test: 15 min de movilidad de cadera y tobillo + core suave (dead bug, plancha lateral). Nada de carrera ni de pesas.' },
+];
+const BORJA_SAT = [
+  { name:'Carrera larga fácil', dur:'35-45 min', focus:'6 km fáciles a 5:50-6:30 min/km, llano o cuestas suaves. Primera salida larga tras la carrera: anota cómo van piernas y tobillo.' },
+  { name:'Carrera larga con desnivel', dur:'60-70 min', focus:'10 km, +150 m D+. Ritmo fácil (5:45-6:15 min/km) en llano; en las subidas, esfuerzo controlado: tienes que poder hablar. Anota km, desnivel y sensaciones.' },
+  { name:'Carrera larga con desnivel', dur:'70-80 min', focus:'12 km, +250 m D+. Fácil, con 3 subidas fuertes de 3 min a RPE 8 repartidas. Si te pasas de umbral, camina rápido: lo que falló el 4/10 fue el ritmo en la subida.' },
+  { name:'Carrera larga con desnivel', dur:'45-55 min', focus:'Descarga: 8 km, +100 m D+, todo fácil.' },
+  { name:'Carrera larga con desnivel', dur:'85-95 min', focus:'14 km, +350 m D+. Subidas a ritmo de carrera (RPE 7-8) y recuperas en las bajadas. Lleva agua; si hace calor, sal pronto.' },
+  { name:'🏁 Test 10K en llano', dur:'≈55 min', focus:'Objetivo ≤52:00 (5:12 min/km) [estimación]. Calienta 15 min + 4 strides. Km 1-2 a ~5:18, km 3-8 a 5:10-5:12, últimos 2 km a lo que quede. Anota tiempo, parciales y pulsaciones.' },
+];
+const BORJA_SUN = { day:'Domingo', name:'Recuperación activa', dur:'30-40 min', focus:'Bici suave 40 min (RPE 3) o movilidad 20 min + 5 min de comba. Cuenta como día de entrenamiento; no hace falta más.', simple:true };
+
+function borjaWeek(n){
+  const tu = BORJA_TUE[n], th = BORJA_THU[n], wo = BORJA_WOD[n], sa = BORJA_SAT[n];
+  return fase(n, [
+    borjaUpper(n),
+    { swim:true, day:'Martes', name:tu.name, dur:tu.dur, focus:tu.focus, simple:true },
+    borjaLegs(n),
+    { swim:true, day:'Jueves', name:th.name, dur:th.dur, focus:th.focus, simple:true },
+    { day:'Viernes', name:wo.name, dur:wo.dur, focus:wo.focus, simple:true },
+    { day:'Sábado', name:sa.name, dur:sa.dur, focus:sa.focus, simple:true },
+    BORJA_SUN,
+  ]);
+}
+
+/* ---------- TATI ---------- */
+function tatiA(n){
+  const cfg = [
+    { s:'3×10 @ RPE 6', h:'3×12', r:'3×10', b:'3×8/pierna', k:'3×12/pierna', note:'Semana de asimilación: carga con la que te sobren 3-4 reps.' },
+    { s:'3×10 @ RPE 7', h:'3×12', r:'3×10', b:'3×8/pierna', k:'3×12/pierna', note:'Sube carga si la semana pasada te sobraron más de 3 reps.' },
+    { s:'4×8 @ RPE 7', h:'4×10', r:'3×8', b:'3×8/pierna', k:'3×12/pierna', note:'Sube carga en sentadilla y hip thrust si las series salieron limpias.' },
+    { s:'3×8 @ RPE 6', h:'3×10', r:'3×8', b:'2×8/pierna', k:'2×12/pierna', note:'Descarga: misma técnica, menos series.' },
+    { s:'4×6-8 @ RPE 8', h:'4×8', r:'3×8', b:'3×8/pierna', k:'3×12/pierna', note:'Semana de pico: las últimas 2 reps tienen que costar.' },
+    { s:'3×6 @ RPE 6', h:'3×8', r:'2×8', b:'2×8/pierna', k:'2×12/pierna', note:'Semana de test: ligero, sin agujetas para el sábado.' },
+  ][n];
+  return { day:'Lunes', name:'Fuerza glúteo y pierna A', dur:'45-55 min', focus:cfg.note + ' Anota peso total y reps totales.',
+    exercises:[
+      E('t_lu_sent','Sentadilla trasera', cfg.s, null),
+      E('t_lu_hip','Hip thrust', cfg.h, 'Pausa de 1 s arriba.'),
+      E('t_lu_rdl','Peso muerto rumano', cfg.r, 'Bajada de 3 s.'),
+      E('t_lu_bulg','Zancadas búlgaras', cfg.b, 'Peso de cada mancuerna; 0 kg = peso corporal.','unilateral'),
+      E('t_lu_kick','Patada de glúteo en polea', cfg.k, null,'unilateral'),
+      E('t_lu_plank','Plancha', '3×30-40 s', 'Segundos totales.','time'),
+    ]};
+}
+function tatiB(n){
+  const light = (n===3 || n===5);
+  const peak = (n===4);
+  return { day:'Jueves', name:'Fuerza glúteo y tirón B', dur:'45-55 min',
+    focus: n===0 ? 'Semana de asimilación: técnica y carga moderada.' : light ? 'Menos series que la semana pasada: no busques fatiga.' : peak ? 'Semana de pico: carga alta, buena técnica.' : 'Sube carga si la semana pasada te sobraron reps.',
+    exercises:[
+      E('t_ju_pm','Peso muerto convencional', light ? '3×5 @ RPE 6' : peak ? '4×5 @ RPE 8' : '3×6 @ RPE 7', 'Anota peso total y reps totales.'),
+      E('t_ju_step','Step-ups con mancuernas', light ? '2×8/pierna' : '3×8/pierna', 'Banco o cajón a la altura de la rodilla; controla la bajada.','unilateral'),
+      E('t_ju_puente','Puente de glúteo a una pierna', light ? '2×12/pierna' : '3×12/pierna', null,'unilateral'),
+      E('t_ju_dom','Dominadas asistidas / remo polea', light ? '2×8' : '3×8-10', null),
+      E('t_ju_face','Face pull', '3×15', null),
+      E('t_ju_talon','Elevación de talones', '3×15', 'Escalón o suelo; con mancuerna si te sobra.'),
+    ]};
+}
+const TATI_FRI = { day:'Viernes', name:'Glúteo y core en casa (opcional)', dur:'25 min', focus:'Opcional: si te apetece sumar glúteo sin carga pesada. 3 rondas, sin pasarte de RPE 6.',
+  exercises:[
+    E('t_vi_hip','Hip thrust', '3×15', 'Peso corporal o con goma sobre las rodillas.'),
+    E('t_vi_abd','Abducción de cadera con goma', '3×15/lado', null,'unilateral'),
+    E('t_vi_deadbug','Dead bug', '3×10/lado', null,'unilateral'),
+    E('t_vi_lateral','Plancha lateral', '3×30 s/lado', 'Segundos totales.','time'),
+  ]};
+const TATI_TUE = [
+  { name:'Carrera fácil + strides', dur:'30-35 min', focus:'4 km fáciles (7:20-7:50 min/km, cómodo) + 4 strides de 20 s rápidos y sueltos. Primera salida tras el trail: sin forzar.' },
+  { name:'Carrera fácil + strides', dur:'30-35 min', focus:'4 km fáciles (7:20-7:50 min/km) + 4 strides de 20 s.' },
+  { name:'Carrera fácil + strides', dur:'35-40 min', focus:'5 km fáciles (7:20-7:50 min/km) + 4 strides de 20 s.' },
+  { name:'Carrera fácil', dur:'25-30 min', focus:'Descarga: 4 km fáciles, sin strides.' },
+  { name:'Carrera fácil + strides', dur:'35-40 min', focus:'5 km fáciles (7:20-7:50 min/km) + 6 strides de 20 s.' },
+  { name:'Carrera de activación', dur:'25-30 min', focus:'3-4 km fáciles + 4 strides de 20 s. Solo soltar piernas para el test del sábado.' },
+];
+const TATI_SAT = [
+  { name:'Carrera larga fácil', dur:'35-40 min', focus:'5 km fáciles (7:20-7:50 min/km). Anota cómo van piernas y tobillos.' },
+  { name:'Carrera de series', dur:'35-40 min', focus:'10 min fácil + 6×1 min a ~6:30 min/km (rápido pero controlado), rec. 90 s andando o trotando + 8 min fácil (≈5 km). Ritmos orientativos: los ajusto con tus registros.' },
+  { name:'Carrera fartlek', dur:'45 min', focus:'10 min fácil + 8×1 min rápido (~6:30 min/km) con 2 min fácil entre medias + 8 min fácil (≈6 km).' },
+  { name:'Carrera larga fácil', dur:'30-35 min', focus:'Descarga: 5 km fáciles (7:20-7:50 min/km).' },
+  { name:'Carrera de series', dur:'55-60 min', focus:'2 km fáciles + 4×1 km a ~6:45 min/km (rec. 2 min andando o trotando) + 1,5 km fáciles (≈8 km en total). Si la tercera repetición ya se va de ritmo, termina con 3.' },
+  { name:'🏁 Test 8 km en llano', dur:'≈55 min', focus:'Objetivo ≤56:00 (7:00 min/km) [estimación]. Calienta 10 min + 4 strides. Km 1-2 a ~7:10, km 3-6 a ~6:55, últimos 2 km a lo que quede. Anota tiempo y sensaciones.' },
+];
+const TATI_REST = (n) => ({ day:'Miércoles', name:'Recuperación activa · core y movilidad', dur:'20 min', focus:'Movilidad de cadera y tobillo + core suave (dead bug, plancha lateral). Opcional pero recomendable.', simple:true });
+const TATI_SUN = { day:'Domingo', name:'Recuperación activa', dur:'30 min', focus:'Caminata o bici suave 30 min. Cuenta como día activo.', simple:true };
+
+function tatiWeek(n){
+  const tu = TATI_TUE[n], sa = TATI_SAT[n];
+  return fase(n, [
+    tatiA(n),
+    { day:'Martes', name:tu.name, dur:tu.dur, focus:tu.focus, simple:true },
+    TATI_REST(n),
+    tatiB(n),
+    TATI_FRI,
+    { day:'Sábado', name:sa.name, dur:sa.dur, focus:sa.focus, simple:true },
+    TATI_SUN,
+  ]);
+}
+
+const PLANS = { borja:{}, tati:{} };
+for(let n=0; n<6; n++){
+  PLANS.borja[FIRST_PHASE+n] = borjaWeek(n);
+  PLANS.tati[FIRST_PHASE+n] = tatiWeek(n);
+}
+
+function phaseForDate(dateKey){
+  const monday = mondayOfWeek(dateKey);
+  const start = new Date(PLAN_START + 'T00:00:00');
+  const weeks = Math.round((monday - start) / (7*86400000));
+  return FIRST_PHASE + Math.max(0, Math.min(5, weeks));
+}
+
+const RACE_DATE = '2026-11-14';
+const RACE_TARGET = { borja: 'Test 10K llano · ≤52:00', tati: 'Test 8 km llano · ≤56:00' };
 const USER_LABEL = { borja: 'Borja', tati: 'Tati' };
 const RUN_RAMP = {
   borja: [
-    { date:'2026-09-05', km:10 },
-    { date:'2026-09-12', km:14 },
-    { date:'2026-09-19', km:17 },
-    { date:'2026-09-26', km:11, note:'último largo, con cuestas, sin forzar' },
-    { date:'2026-10-03', km:4, note:'shakeout muy suave, no rodaje largo' },
-    { date:'2026-10-04', km:15, note:'🏁 carrera · +500 m D+' },
+    { date:'2026-10-10', km:6, note:'fácil' },
+    { date:'2026-10-17', km:10, note:'+150 m D+' },
+    { date:'2026-10-24', km:12, note:'+250 m D+' },
+    { date:'2026-10-31', km:8, note:'descarga, +100 m D+' },
+    { date:'2026-11-07', km:14, note:'+350 m D+' },
+    { date:'2026-11-14', km:10, note:'🏁 test 10K en llano' },
   ],
   tati: [
-    { date:'2026-09-05', km:6 },
-    { date:'2026-09-12', km:8 },
-    { date:'2026-09-19', km:10 },
-    { date:'2026-09-26', km:11 },
-    { date:'2026-10-03', km:4, note:'shakeout muy suave, no rodaje largo' },
+    { date:'2026-10-10', km:5, note:'fácil' },
+    { date:'2026-10-17', km:5, note:'6×1 min rápidos' },
+    { date:'2026-10-24', km:6, note:'fartlek' },
+    { date:'2026-10-31', km:5, note:'descarga' },
+    { date:'2026-11-07', km:8, note:'4×1 km' },
+    { date:'2026-11-14', km:8, note:'🏁 test 8 km en llano' },
   ],
 };
 
@@ -828,8 +1054,8 @@ function renderRaceCard(){
   card.style.display = 'flex';
   card.innerHTML = `
     <div class="race-left">
-      <div class="race-title">🏔️ Trail — ${target}</div>
-      <div class="race-sub">${label} · 4 de octubre de 2026</div>
+      <div class="race-title">🎯 ${target}</div>
+      <div class="race-sub">${label} · sábado 14 de noviembre</div>
     </div>
     <div style="text-align:center;">
       <div class="race-days">${diffDays}</div>
@@ -860,8 +1086,8 @@ function renderRampCard(){
   card.style.display = 'block';
   card.innerHTML = `
     <div class="ramp-card">
-      <div class="ramp-title">📈 Progresión hacia el trail</div>
-      <div class="ramp-sub">Objetivo de distancia para tu carrera larga del sábado</div>
+      <div class="ramp-title">📈 Tiradas del sábado hasta el test</div>
+      <div class="ramp-sub">Distancia objetivo de la salida larga de cada sábado</div>
       <div class="ramp-list">${rows}</div>
     </div>`;
 }
@@ -926,13 +1152,6 @@ const STRETCHES = {
   ],
 };
 
-const DAILY_TIPS = {
-  fuerza: '💡 Si te cuesta arrancar hoy, una cápsula de cafeína 30-45 min antes puede ayudarte — resérvala para los días que de verdad lo necesites, no a diario.',
-  carrera: '💡 Si la salida pasa de 60 min o hace calor, lleva agua y valora electrolitos — con el calor que describiste el 5/9, la deshidratación pasa factura antes de lo que crees.',
-  recuperacion: '💡 Aprovecha hoy para dormir un poco más si puedes — es el día donde más se nota la diferencia en recuperación.',
-  wod: '💡 Prioriza técnica sobre velocidad, sobre todo en las primeras rondas cuando aún estás fresco.',
-};
-
 async function renderNutriCard(){
   const card = document.getElementById('nutriCard');
   const dateKey = currentDate;
@@ -953,11 +1172,10 @@ async function renderNutriCard(){
   }
 
   const items = [
-    { key:'creatina', label:'Creatina', detail:'3-5g, cualquier momento del día (dosis de mantenimiento habitual)' },
+    { key:'creatina', label:'Creatina', detail:'3-5 g al día' },
     { key:'proteina', label:'Proteína', detail: proteinLine },
-    { key:'carbs', label:'Hidratos', detail:'Prioriza antes/después de entrenar, sobre todo en días de carrera larga' },
-    { key:'agua', label:'Hidratación', detail:'Especialmente en días de carrera o calor' },
-    { key:'omega3', label:'Omega-3', detail:'A diario, salud general y apoyo a la recuperación' },
+    { key:'agua', label:'Hidratación', detail:'Más en tiradas largas y con calor' },
+    { key:'omega3', label:'Omega-3', detail:'A diario' },
   ];
 
   const rows = items.map(it=>{
@@ -977,21 +1195,16 @@ async function renderNutriCard(){
     <div class="nutri-row">
       <div style="flex:1">
         <div class="nutri-label">Sueño (horas)</div>
-        <div class="nutri-detail">Objetivo: 7-9h para recuperar bien</div>
+        <div class="nutri-detail">Objetivo: 7-9 h</div>
       </div>
       <input type="number" inputmode="decimal" step="0.5" id="sleepInput" value="${sleepVal}" style="width:56px; background:var(--card2); border:0.5px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; padding:7px; text-align:center;">
     </div>`;
 
-  const dIdx = weekdayIndexFromDate(dateKey);
-  const dDef = plan()[currentPhase].days[dIdx];
-  const tip = dDef ? DAILY_TIPS[stretchKeyFor(dDef)] : null;
-
   card.innerHTML = `
     <div class="nutri-title">🍽️ Hoy</div>
-    <div class="nutri-sub">Pautas generales, no sustituyen el consejo de un profesional</div>
     ${rows}
     ${sleepRow}
-    ${tip ? `<div class="nutri-detail" style="margin-top:10px; color:var(--accent);">${tip}</div>` : ''}`;
+    `;
 
   const sleepInput = document.getElementById('sleepInput');
   if(sleepInput){
@@ -1044,7 +1257,8 @@ function stretchKeyFor(d){
   return 'fuerza';
 }
 
-let currentPhase = 1;
+let currentPhase = FIRST_PHASE;
+let phaseManual = false;
 let calYear, calMonth;
 let progSelectedName = null;
 
@@ -1065,6 +1279,7 @@ function daysAgoStr(n){
 let currentDate = todayStr();
 
 function goToday(){
+  phaseManual = false;
   currentDate = todayStr();
   document.getElementById('datePicker').value = currentDate;
   renderWeek();
@@ -1093,10 +1308,10 @@ function buildPhaseRow(){
   Object.keys(plan()).map(Number).sort((a,b)=>a-b).forEach(p=>{
     const b = document.createElement('button');
     b.className = 'phase-btn' + (p===currentPhase?' active':'');
-    b.textContent = 'Fase ' + p;
+    b.textContent = plan()[p].short || ('Fase ' + p);
     b.onclick = ()=>{
       currentPhase = p;
-      try{ localStorage.setItem(uk('lastPhase'), String(p)); }catch(e){}
+      phaseManual = true;
       buildPhaseRow();
       renderWeek();
     };
@@ -1221,6 +1436,10 @@ async function renderSummary(){
 }
 
 async function renderWeek(){
+  if(!phaseManual){
+    const auto = phaseForDate(currentDate);
+    if(auto !== currentPhase || !document.querySelector('.phase-btn')){ currentPhase = auto; buildPhaseRow(); }
+  }
   await renderSummary();
   await renderNutriCard();
   renderRaceCard();
@@ -1537,7 +1756,6 @@ async function renderDayBodyCore(d, idx){
       <button class="simple-toggle ${sessionDone?'done':''}" id="sessionBtn_${idx}">
         ${sessionDone ? '✓ Sesión completada' : 'Marcar sesión como completada'}
       </button>
-      <div class="ex-target" style="margin:-4px 0 10px; text-align:center;">Aunque no marques cada ejercicio, esto cuenta el día como hecho</div>
     `;
     for(const ex of d.exercises){
       const exLog = log[ex.id] || {};
@@ -1811,6 +2029,7 @@ async function renderCalendar(){
     if(dateKey === today) cls += ' is-today';
     cell.className = cls;
     cell.onclick = ()=>{
+      phaseManual = false;
       currentDate = dateKey;
       switchView('plan');
       document.getElementById('datePicker').value = dateKey;
@@ -1899,8 +2118,14 @@ async function collectAllLogs(){
   return results;
 }
 
+function allPhaseDefs(){
+  const out = [];
+  [PLANS[currentUser], LEGACY_PLANS[currentUser]].forEach(p=>{ if(p) out.push(...Object.values(p)); });
+  return out;
+}
+
 function exModeFromId(id){
-  for(const phase of Object.values(plan())){
+  for(const phase of allPhaseDefs()){
     for(const day of phase.days){
       if(day.exercises){
         const found = day.exercises.find(e=>e.id===id);
@@ -1920,7 +2145,7 @@ function exNameFromId(id, log){
       }
     }
   }
-  for(const phase of Object.values(plan())){
+  for(const phase of allPhaseDefs()){
     for(const day of phase.days){
       if(day.exercises){
         const found = day.exercises.find(e=>e.id===id);
@@ -2005,7 +2230,7 @@ async function renderComparativaCard(){
   const other = currentUser==='borja' ? 'tati' : 'borja';
   const otherData = data && data[other] ? data[other] : null;
   const updatedNote = data && data.updated
-    ? `Datos de ${USER_LABEL[other]} actualizados a partir de vuestra última exportación (${data.updated})`
+    ? `Datos de ${USER_LABEL[other]}: semana ${data.weekOf || ''} (última exportación ${data.updated})`
     : `Aún no hay datos de ${USER_LABEL[other]} — en cuanto exporte su historial y me lo paséis, lo actualizo aquí.`;
 
   return `
@@ -2126,7 +2351,7 @@ async function renderProgress(){
   html += `
     <div class="prog-card">
       <div class="prog-title">Kilómetros corridos por semana</div>
-      <div class="prog-sub">Rumbo al trail del 4 de octubre</div>
+      <div class="prog-sub">Rumbo al test del 14 de noviembre</div>
       ${svgBarChart(weeklyKmBars, {flat:true, showValue:true})}
     </div>`;
 
@@ -2248,8 +2473,6 @@ async function seedBorjaHistory(){
   l06['comment_p1_d6'] = 'Saltos a la comba, unos 5 min.';
   l06['p1_d6'] = { done:true };
   await saveLog('2026-09-06', l06);
-
-  try{ localStorage.setItem(uk('lastPhase'), '2'); }catch(e){}
 
   await window.storage.set(uk('weight:2026-09-09'), '95.1');
   await window.storage.set(uk('weight:2026-09-10'), '95.2');
@@ -2486,16 +2709,15 @@ document.getElementById('backupFileInput').addEventListener('change', (e)=>{
 });
 
 document.getElementById('datePicker').addEventListener('change', (e)=>{
+  phaseManual = false;
   currentDate = e.target.value;
   renderWeek();
 });
 
 async function startApp(){
   await seedBorjaHistory();
-  try{
-    const savedPhase = parseInt(localStorage.getItem(uk('lastPhase')), 10);
-    if(savedPhase && plan()[savedPhase]) currentPhase = savedPhase;
-  }catch(e){}
+  phaseManual = false;
+  currentPhase = phaseForDate(todayStr());
   buildPhaseRow();
   goToday();
   let lastView = 'plan';
