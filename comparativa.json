@@ -1,13 +1,14 @@
 {
-  "updated": "2026-09-27",
+  "updated": "2026-10-04",
+  "weekOf": "28/9-4/10",
   "borja": {
-    "streak": 28,
+    "streak": 35,
     "daysThisWeek": 7,
-    "kmThisWeek": 20
+    "kmThisWeek": 27.2
   },
   "tati": {
-    "streak": 0,
-    "daysThisWeek": 0,
-    "kmThisWeek": 0
+    "streak": 1,
+    "daysThisWeek": 1,
+    "kmThisWeek": 8
   }
 }
