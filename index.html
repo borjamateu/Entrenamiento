@@ -788,7 +788,7 @@ tati: {
 const FIRST_PHASE = 10;
 const PLAN_START = '2026-10-05';
 const WEEK_RANGES = ['5-11/10','12-18/10','19-25/10','26/10-1/11','2-8/11','9-15/11'];
-const WEEK_TITLES = ['Asimilación','Carga','Carga + test 5K','Descarga','Pico','Test 10K'];
+const WEEK_TITLES = ['Asimilación','Carga · reentrada','Carga + test 5K','Descarga','Pico','Test 10K'];
 
 function E(id, name, target, note, mode){
   const o = { id, name, target };
@@ -808,13 +808,14 @@ function borjaUpper(n){
     ? { banca:'3×6 @ RPE 6 · descanso 2 min', remo:'3×8 · descanso 90 s', mil:'3×6 @ RPE 6 · descanso 2 min', dom:'3×3-4 estrictas · descanso 2 min', fond:'2×8 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'2×10 · descanso 60 s' }
     : peak
     ? { banca:'4×5 @ RPE 8 · descanso 2-3 min', remo:'4×6 · descanso 90 s', mil:'4×5 @ RPE 8 · descanso 2-3 min', dom:'4×4-5 estrictas · descanso 2 min', fond:'3×10 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'3×8 · descanso 60 s' }
-    : { banca:'4×6 @ RPE 7 · descanso 2 min', remo:'4×8 · descanso 90 s', mil:'4×6 @ RPE 7 · descanso 2 min', dom:'4×3-4 estrictas · descanso 2 min', fond:'3×8 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'3×10 · descanso 60 s' };
+    : (n===2) ? { banca:'3×6 @ RPE 6-7 · descanso 2 min', remo:'3×8 · descanso 90 s', mil:'3×6 @ RPE 6-7 · descanso 2 min', dom:'3×3-4 estrictas · descanso 2 min', fond:'3×6-8 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'3×10 · descanso 60 s' }
+: { banca:'4×6 @ RPE 7 · descanso 2 min', remo:'4×8 · descanso 90 s', mil:'4×6 @ RPE 7 · descanso 2 min', dom:'4×3-4 estrictas · descanso 2 min', fond:'3×8 · descanso 90 s', face:'3×12 · descanso 60 s', curl:'3×10 · descanso 60 s' };
   const first = (n===0);
   return { day:'Lunes', name: light ? 'Fuerza tren superior (ligera)' : 'Fuerza tren superior', dur:'50-60 min',
     focus: n===0 ? 'Semana de asimilación tras la carrera: el tren superior está fresco, aprovecha. Deja 1-2 reps en reserva en cada serie.'
          : n===3 ? 'Descarga: mismas cargas que la semana pasada, menos series.'
          : n===5 ? 'Semana de test: mantén la carga, quita series. El sábado es lo importante.'
-         : 'Si la semana pasada completaste todas las reps limpias, sube 2,5 kg. Deja 1-2 reps en reserva.',
+         : n===2 ? 'Primera sesión de fuerza tras casi dos semanas sin pesas (las últimas, el 5 y el 7/10): hoy NO se sube carga. Usa el peso de esa sesión (mira "última vez"), una serie menos en banca, remo y militar, y deja 2-3 reps en reserva. Si todo sale limpio, la progresión se retoma el 26/10.' : 'Si la semana pasada completaste todas las reps limpias, sube 2,5 kg. Deja 1-2 reps en reserva.',
     exercises:[
       E('b_lu_banca','Press banca', t.banca, first ? 'Parte de ~60 kg [estimación] (tu marca: 55 kg el 16/9). Anota peso total y reps totales.' : 'Anota peso total y reps totales.'),
       E('b_lu_remo','Remo con barra', t.remo, first ? 'Parte de ~30 kg [estimación]. Espalda plana.' : null),
@@ -822,7 +823,8 @@ function borjaUpper(n){
       E('b_lu_dom','Dominadas lastradas', t.dom, '0 kg = peso corporal. Estrictas: sin balanceo.'),
       E('b_lu_fond','Fondos en paralelas', t.fond, '0 kg = peso corporal.'),
       E('b_lu_face','Face pull', t.face, null),
-      E('b_lu_curl','Curl martillo con mancuernas', t.curl, 'Peso total de las dos mancuernas.'),
+      n===2 ? E('f7_mi_5','Curl con barra EZ', t.curl, 'Agarre estrecho, sin balanceo. Peso con el que 10 reps te dejen 2 de reserva.') : n===4 ? E('f8_mi_5','Curl inclinado con mancuernas', t.curl, 'Banco a 45°, brazos colgando. Peso individual de cada mancuerna.') : E('b_lu_curl','Curl martillo con mancuernas', t.curl, 'Peso total de las dos mancuernas.'),
+...((n===2 || n===4) ? [E('f4_mi_6','Extensión de tríceps sobre la cabeza','3×12 · descanso 60 s','Codos cerrados. Mancuerna a dos manos o polea con cuerda.')] : []),
       E('b_lu_comba','Comba (finisher)', '5 min continuos', 'Anota los segundos totales de salto.', 'time'),
     ]};
 }
@@ -862,13 +864,13 @@ function borjaLegs(n){
     const peak = (n===4);
     focus = peak
       ? 'Semana de pico: la sentadilla sube a RPE 8. Si el martes de cuestas te dejó las piernas muy cargadas, baja a 4 series.'
-      : 'Sube 2,5 kg en sentadilla si las 5 series de la semana pasada salieron limpias. Step-ups y búlgaras son lo más parecido a una subida de montaña.';
+      : n===2 ? 'Reentrada: casi dos semanas sin pierna pesada (la última, el 7/10) y mañana es el test de 5K, así que hoy sesión moderada: una serie menos de sentadilla, menos series de step-ups y búlgaras y sin saltos. Deja 2-3 reps en reserva, sin llegar al fallo.' : 'Sube 2,5 kg en sentadilla si las 5 series de la semana pasada salieron limpias. Step-ups y búlgaras son lo más parecido a una subida de montaña.';
     ex = [
-      E('b_mi_sent','Sentadilla trasera', peak ? '5×5 @ RPE 8 · descanso 2-3 min' : '5×5 @ RPE 7 · descanso 2-3 min', n===1 ? 'Parte de 60 kg [estimación]. Anota peso total y reps totales (25).' : 'Anota peso total y reps totales (25).'),
-      E('b_mi_step','Step-ups con mancuernas','4×8/pierna · descanso 90 s', n===1 ? 'Cajón o banco a la altura de la rodilla; ~12 kg por mano [estimación]. Controla la bajada.' : 'Controla la bajada.','unilateral'),
-      E('b_mi_bulg','Zancadas búlgaras','3×8/pierna · descanso 90 s', n===1 ? '~14 kg por mano [estimación].' : null,'unilateral'),
+      E('b_mi_sent','Sentadilla trasera', peak ? '5×5 @ RPE 8 · descanso 2-3 min' : (n===2 ? '4×5 @ RPE 6-7 · descanso 2-3 min' : '5×5 @ RPE 7 · descanso 2-3 min'), n===1 ? 'Parte de 60 kg [estimación]. Anota peso total y reps totales (25).' : (n===2 ? 'Primera pierna tras dos semanas: usa el peso del 7/10 y sube solo 2,5 kg si vuela. Anota peso total y reps totales (20).' : 'Anota peso total y reps totales (25).')),
+      E('b_mi_step','Step-ups con mancuernas', n===2 ? '3×8/pierna · descanso 90 s' : '4×8/pierna · descanso 90 s', n===1 ? 'Cajón o banco a la altura de la rodilla; ~12 kg por mano [estimación]. Controla la bajada.' : 'Controla la bajada.','unilateral'),
+      E('b_mi_bulg','Zancadas búlgaras', n===2 ? '2×8/pierna · descanso 90 s' : '3×8/pierna · descanso 90 s', n===1 ? '~14 kg por mano [estimación].' : null,'unilateral'),
       E('b_mi_rdl','Peso muerto rumano','3×8 · bajada de 3 s · descanso 90 s', n===1 ? 'Parte de ~55 kg [estimación].' : null),
-      E('b_mi_salto','Saltos al cajón','4×5 · descanso 60 s','Altura cómoda, baja andando. Calidad sobre cantidad.'),
+      ...(n===2 ? [] : [E('b_mi_salto','Saltos al cajón','4×5 · descanso 60 s','Altura cómoda, baja andando. Calidad sobre cantidad.')]),
       E('b_mi_talon','Elevación de talones a una pierna','3×15/pierna · descanso 60 s','Con mancuerna.','unilateral'),
     ];
   }
@@ -878,7 +880,7 @@ function borjaLegs(n){
 const BORJA_TUE = [
   { name:'Carrera con cuestas', dur:'35-40 min', focus:'4 km fáciles (5:50-6:30 min/km) + 6 strides de 10 s en cuesta, rápidos y sueltos, bajando andando. Primer contacto con la cuesta, sin fatiga.' },
   { name:'Carrera con cuestas', dur:'40-45 min', focus:'15 min fácil + 8×45 s en cuesta (6-10 %) a RPE 8, bajando trotando suave + 10 min fácil. Zancada corta y brazos activos.' },
-  { name:'Carrera con cuestas', dur:'45-50 min', focus:'15 min fácil + 6×2 min en cuesta a RPE 8, bajando trotando + 10 min fácil. Si te pasas de umbral, camina rápido (manos en los muslos) el tramo final: es parte del entrenamiento.' },
+  { name:'Carrera con cuestas', dur:'40-45 min', focus:'Reentrada (el jueves es el test de 5K): 15 min fácil + 5×90 s en cuesta a RPE 7-8, bajando trotando + 10 min fácil. Si te pasas de umbral, camina rápido (manos en los muslos) el tramo final: es parte del entrenamiento.' },
   { name:'Carrera con cuestas', dur:'35-40 min', focus:'Descarga: 15 min fácil + 5×1 min en cuesta a RPE 8 + 10 min fácil. No añadas repeticiones.' },
   { name:'Carrera con cuestas', dur:'50-55 min', focus:'15 min fácil + 5×3 min en cuesta a RPE 8-9, el último de cada serie a tope, bajando trotando + 10 min fácil. Camina rápido lo que no puedas correr sin pasarte del umbral.' },
   { name:'Carrera de activación', dur:'30-35 min', focus:'4 km fáciles + 6×1 min en cuesta a RPE 7 (sin ir a tope) + 4 strides. Solo activar piernas para el test del sábado.' },
@@ -886,10 +888,10 @@ const BORJA_TUE = [
 const BORJA_THU = [
   { name:'Carrera suave + core', dur:'40 min', focus:'25 min fáciles a 5:50-6:30 min/km. Después, core: 3 rondas de 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof press por lado.' },
   { name:'Carrera de series (llano)', dur:'45-50 min', focus:'15 min fácil + 6×400 m a ~4:40 min/km (rec. 90 s trote) + 10 min fácil. Ritmos orientativos: los ajusto con tus registros.' },
-  { name:'Carrera test 5K', dur:'45 min', focus:'15 min fácil + 4 strides y 5 km en llano a tope controlado. Objetivo ≤25:30 (5:06 min/km) [estimación]: salida a ~5:10, no más rápido. Este dato decide si seguimos con la meta de 52:00 en el 10K o la ajustamos a 53:00. Anota tiempo y pulsaciones.' },
-  { name:'Carrera de series (llano)', dur:'40-45 min', focus:'Descarga: 15 min fácil + 4×400 m a ~4:40 min/km (rec. 90 s trote) + 10 min fácil.' },
-  { name:'Carrera de series (llano)', dur:'50-55 min', focus:'15 min fácil + 5×1 km a ~5:00 min/km (rec. 2 min trote) + 10 min fácil. Si la tercera repetición ya se te va de ritmo, termina con 4.' },
-  { name:'Carrera de series (llano)', dur:'40 min', focus:'15 min fácil + 4×1 min a ~4:50 min/km (rec. 1 min 30 s) + 10 min fácil. Afinar, no entrenar: sin pasarte.' },
+  { name:'Carrera test 5K', dur:'45 min', focus:'15 min fácil + 4 strides y 5 km en llano a tope controlado. Objetivo ≤24:00 (4:48 min/km) [estimación a partir de tus 6 km a 4:34 y 9 km a 5:04 de esta semana, sin pulsaciones]: sal a ~4:50, no más rápido, y aguanta. Este dato decide la meta del 10K (≈ tiempo de 5K × 2,08 [estimación]): ≤23:30 → 10K ≤49:00; ≤24:30 → ≤50:00 (5:00 min/km); más lento → ≤52:00 (5:12 min/km). Anota tiempo y pulsaciones.' },
+  { name:'Carrera de series (llano)', dur:'40-45 min', focus:'Descarga: 15 min fácil + 4×400 m a ~4:25 min/km (rec. 90 s trote) + 10 min fácil.' },
+  { name:'Carrera de series (llano)', dur:'50-55 min', focus:'15 min fácil + 5×1 km a ~4:50 min/km (rec. 2 min trote) + 10 min fácil. Si la tercera repetición ya se te va de ritmo, termina con 4.' },
+  { name:'Carrera de series (llano)', dur:'40 min', focus:'15 min fácil + 4×1 min a ~4:30 min/km (rec. 1 min 30 s) + 10 min fácil. Afinar, no entrenar: sin pasarte.' },
 ];
 const BORJA_WOD = [
   { name:'WOD tren superior y core', dur:'25-30 min', focus:'AMRAP 15 min: 5 dominadas (o 8 remos con mancuerna por lado) · 10 flexiones · 12 sit-ups · plancha 20 s. Sin piernas: mañana toca tirada. Anota rondas.' },
@@ -901,11 +903,11 @@ const BORJA_WOD = [
 ];
 const BORJA_SAT = [
   { name:'Carrera larga fácil', dur:'35-45 min', focus:'6 km fáciles a 5:50-6:30 min/km, llano o cuestas suaves. Primera salida larga tras la carrera: anota cómo van piernas y tobillo.' },
-  { name:'Carrera larga con desnivel', dur:'60-70 min', focus:'10 km, +150 m D+. Ritmo fácil (5:45-6:15 min/km) en llano; en las subidas, esfuerzo controlado: tienes que poder hablar. Anota km, desnivel y sensaciones.' },
+  { name:'Carrera larga con desnivel', dur:'60-70 min', focus:'10 km, +150 m D+; si puedes, en tierra o césped (esta semana todo ha sido asfalto y carga más gemelo y tibial). Ritmo fácil (5:30-6:00 min/km, calibrado con tus 9 km a 5:04) en llano; en las subidas, esfuerzo controlado: tienes que poder hablar. Anota km, desnivel y sensaciones.' },
   { name:'Carrera larga con desnivel', dur:'70-80 min', focus:'12 km, +250 m D+. Fácil, con 3 subidas fuertes de 3 min a RPE 8 repartidas. Si te pasas de umbral, camina rápido: lo que falló el 4/10 fue el ritmo en la subida.' },
   { name:'Carrera larga con desnivel', dur:'45-55 min', focus:'Descarga: 8 km, +100 m D+, todo fácil.' },
   { name:'Carrera larga con desnivel', dur:'85-95 min', focus:'14 km, +350 m D+. Subidas a ritmo de carrera (RPE 7-8) y recuperas en las bajadas. Lleva agua; si hace calor, sal pronto.' },
-  { name:'🏁 Test 10K en llano', dur:'≈55 min', focus:'Objetivo ≤52:00 (5:12 min/km) [estimación]. Calienta 15 min + 4 strides. Km 1-2 a ~5:18, km 3-8 a 5:10-5:12, últimos 2 km a lo que quede. Anota tiempo, parciales y pulsaciones.' },
+  { name:'🏁 Test 10K en llano', dur:'≈55 min', focus:'Objetivo ≤50:00 (5:00 min/km) [estimación; se confirma con el test de 5K del 22/10, si sale peor vuelve a ≤52:00]. Calienta 15 min + 4 strides. Km 1-2 a ~5:06, km 3-8 a 4:58-5:00, últimos 2 km a lo que quede. Anota tiempo, parciales y pulsaciones.' },
 ];
 const BORJA_SUN = { day:'Domingo', name:'Recuperación activa', dur:'30-40 min', focus:'Bici suave 40 min (RPE 3) o movilidad 20 min + 5 min de comba. Cuenta como día de entrenamiento; no hace falta más.', simple:true };
 
@@ -1009,7 +1011,7 @@ function phaseForDate(dateKey){
 }
 
 const RACE_DATE = '2026-11-14';
-const RACE_TARGET = { borja: 'Test 10K llano · ≤52:00', tati: 'Test 8 km llano · ≤56:00' };
+const RACE_TARGET = { borja: 'Test 10K llano · ≤50:00', tati: 'Test 8 km llano · ≤56:00' };
 const USER_LABEL = { borja: 'Borja', tati: 'Tati' };
 const RUN_RAMP = {
   borja: [
