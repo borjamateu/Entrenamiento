@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b0d12">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -333,6 +333,143 @@
     background:var(--card2); border-radius:8px; padding:7px 10px;
   }
   .stretch-list li b{color:var(--text); font-weight:500;}
+
+  /* ================= v11 · legibilidad y uso diario ================= */
+  :root{
+    --text2:#c6cddd; --muted:#8e98ae; --border:#313748;
+    --accent-light:#8fb0ff;
+  }
+  html{-webkit-text-size-adjust:100%;}
+  body{font-size:16px; line-height:1.4; padding-bottom:0;}
+  header{position:static; padding:18px 16px 6px; background:none; border-bottom:none;}
+  h1{font-size:22px; letter-spacing:-0.3px; padding-right:84px;}
+  .sub{display:none;}
+  .streak-pill{font-size:13.5px; padding:6px 13px;}
+  .user-switch{font-size:13px; padding:8px 12px; top:16px; border-radius:10px; z-index:12;}
+
+  /* barra de semana + tira de días */
+  .weekbar{display:flex; align-items:center; gap:10px; padding:10px 16px 8px;}
+  .wk-btn{width:44px; height:44px; border-radius:12px; border:0.5px solid var(--border); background:var(--card);
+    color:var(--text); font-size:22px; flex-shrink:0;}
+  .wk-btn:disabled{opacity:0.3;}
+  .wk-center{flex:1; text-align:center; min-width:0;}
+  .wk-title{font-size:15.5px; font-weight:700; line-height:1.25;}
+  .wk-sub{font-size:13.5px; color:var(--text2); margin-top:1px;}
+  .weekstrip{position:sticky; top:0; z-index:9; display:flex; gap:6px; padding:8px 12px 10px;
+    background:rgba(11,13,18,0.96); backdrop-filter:blur(6px); border-bottom:0.5px solid var(--border);}
+  .wk-chip{flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px; padding:6px 0 6px;
+    border-radius:12px; border:0.5px solid var(--border); border-bottom:3px solid var(--border); background:var(--card); color:var(--text2);}
+  .wk-chip.type-fuerza{border-bottom-color:var(--accent);}
+  .wk-chip.type-carrera{border-bottom-color:var(--green);}
+  .wk-chip.type-recuperacion{border-bottom-color:var(--amber);}
+  .wk-chip.type-wod{border-bottom-color:var(--red);}
+  .wk-l{font-size:12px; font-weight:700; letter-spacing:0.3px;}
+  .wk-n{font-size:17px; font-weight:800; color:var(--text);}
+  .wk-i{font-size:13px; line-height:1.2; min-height:16px;}
+  .wk-chip.today{background:var(--accent2); border-color:var(--accent); border-bottom-width:3px;}
+  .wk-chip.today .wk-l{color:#d6e3ff;}
+  .wk-chip.done{background:var(--greenbg);}
+  .wk-chip.done .wk-n{color:#8fe8b6; text-decoration:line-through; text-decoration-thickness:2px;}
+
+  .date-picker-row{padding:12px 16px 0;}
+  .date-picker-row input[type=date]{font-size:15px; padding:11px 12px; min-height:44px;}
+  .today-btn{font-size:15px; padding:11px 16px; min-height:44px; font-weight:700;}
+
+  /* tarjetas de día */
+  .week{padding:12px 12px 4px; gap:12px;}
+  .day-card{border-radius:18px; border-left-width:5px; scroll-margin-top:84px;}
+  .day-card.is-today{border-color:var(--accent); border-left-color:var(--accent);
+    box-shadow:0 0 0 1.5px var(--accent) inset, var(--shadow);}
+  .day-head{padding:14px 14px 14px 12px; align-items:flex-start; gap:10px;}
+  .day-main{flex:1; min-width:0;}
+  .day-meta{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text2);
+    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;}
+  .hoy-pill{background:var(--accent); color:#06122e; font-size:12px; font-weight:800; padding:2px 9px; border-radius:20px; letter-spacing:0.5px;}
+  .day-title{display:flex; align-items:flex-start; gap:8px;}
+  .day-icon{font-size:22px; margin-top:0;}
+  .day-name{font-size:18px; font-weight:700; line-height:1.25;}
+  .day-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .chip{font-size:13.5px; font-weight:600; padding:4px 10px; border-radius:20px; background:var(--card2);
+    border:0.5px solid var(--border); color:var(--text);}
+  .chip-swim{background:rgba(56,189,248,0.12); border-color:rgba(56,189,248,0.45); color:#9be1ff;}
+  .chip-run{background:var(--greenbg); border-color:rgba(52,211,153,0.45); color:#8fe8b6;}
+  .day-focus{font-size:15px; line-height:1.5; color:var(--text2); margin-top:9px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .day-card.open .day-focus{-webkit-line-clamp:unset; display:block; color:var(--text);}
+  .day-right{flex-direction:column; align-items:center; gap:10px; padding-top:2px;}
+  .check-badge{width:32px; height:32px; font-size:17px;}
+  .chev{font-size:15px; color:var(--muted); transition:transform .15s ease;}
+  .day-card.open .chev{transform:rotate(180deg);}
+  .day-body{padding:0 14px 18px;}
+
+  /* ejercicios */
+  .exercise{padding:15px 0;}
+  .ex-top{gap:12px; align-items:flex-start;}
+  .ex-name{font-size:17px; font-weight:700; line-height:1.3;}
+  .ex-target{font-size:15.5px; font-weight:700; color:var(--accent-light); margin-top:4px; line-height:1.35;}
+  .ex-note{font-size:14px; color:var(--text2); line-height:1.5; margin-top:6px; padding-left:9px;}
+  .ex-last{font-size:14px; color:var(--amber); margin-top:5px; font-weight:600;}
+  .ex-check{width:38px; height:38px; font-size:18px;}
+  .ex-inputs{gap:10px; margin-top:10px;}
+  .ex-inputs input{font-size:18px; padding:12px; min-height:48px; border-radius:11px; font-weight:600;}
+  .ex-inputs label{font-size:13px; color:var(--text2); margin-bottom:4px;}
+  .simple-toggle{font-size:16px; padding:15px; border-radius:12px; font-weight:600;}
+  .comment-box label{font-size:13px; color:var(--text2);}
+  .comment-box textarea{font-size:16px; min-height:56px;}
+  .add-ex-btn{font-size:15px; padding:13px;}
+  .custom-ex-name{font-size:16px; padding:12px;}
+  .save-btn{font-size:16.5px; padding:15px; border-radius:13px;}
+  .saved-note{font-size:14px;}
+  .stretch-title{font-size:14px;}
+  .stretch-list li{font-size:14px; padding:9px 11px;}
+
+  /* tarjetas informativas */
+  .race-card{margin:6px 12px 0; padding:10px 14px; border-radius:14px;}
+  .race-title{font-size:15px;}
+  .race-sub{font-size:13px; text-transform:none;}
+  .race-days{font-size:26px;}
+  .race-days-label{font-size:11px;}
+  .fold{margin:14px 12px 0; background:var(--card); border:0.5px solid var(--border); border-radius:14px; box-shadow:var(--shadow);}
+  .fold > summary{list-style:none; cursor:pointer; padding:15px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    font-size:15.5px; font-weight:700; min-height:52px;}
+  .fold > summary::-webkit-details-marker{display:none;}
+  .fold > summary::after{content:'▾'; color:var(--muted); font-size:14px;}
+  .fold[open] > summary::after{transform:rotate(180deg);}
+  .fold-count{margin-left:auto; font-size:14px; font-weight:600; color:var(--accent-light);}
+  .fold-body{padding:0 14px 12px;}
+  .fold .ramp-list{padding:0 12px 12px;}
+  .ramp-row{font-size:15px; padding:11px 12px;}
+  .ramp-note{font-size:13px; color:var(--text2);}
+  .nutri-card{margin:0; padding:0; background:none; border:none; box-shadow:none;}
+  .nutri-row{padding:12px 0;}
+  .nutri-check{width:30px; height:30px; font-size:16px;}
+  .nutri-label{font-size:16px;}
+  .nutri-detail{font-size:13.5px; color:var(--text2);}
+  #sleepInput{font-size:17px !important; width:72px !important; padding:9px !important;}
+  .summary-row{padding:14px 12px 0;}
+  .summary-label{font-size:12px; color:var(--text2);}
+  .summary-value{font-size:21px;}
+  .summary-value.small{font-size:16px;}
+  .summary-delta{font-size:13px;}
+
+  /* navegación inferior */
+  .footer-nav{padding:10px 10px calc(10px + env(safe-area-inset-bottom)); gap:6px; z-index:20;}
+  .nav-btn{font-size:12px; padding:9px 2px; min-height:56px; gap:3px;}
+  .nav-btn .nav-icon{font-size:22px;}
+
+  /* otras vistas */
+  .hist-date{font-size:15px;} .hist-line{font-size:14.5px; padding:4px 0;}
+  .weight-row{padding:14px;} .weight-date{font-size:15px;} .weight-kg{font-size:17px;}
+  .weight-form input[type=date]{font-size:15px; width:132px; padding:11px 8px;}
+  .weight-form input[type=number]{font-size:17px; padding:11px;}
+  .weight-form button{font-size:15px; padding:11px 16px;}
+  .cal-month-label{font-size:17px;} .cal-cell{font-size:15px;} .cal-dow{font-size:12.5px;} .cal-legend{font-size:13px;}
+  .prog-title{font-size:15.5px;} .prog-sub{font-size:13.5px; color:var(--text2);}
+  .ex-select{font-size:16px; padding:12px;}
+  .compare-name{font-size:13.5px;} .compare-val{font-size:20px;} .compare-sub{font-size:12.5px; color:var(--text2);}
+  .profile-picker h2{font-size:22px;} .profile-picker p{font-size:15px;} .profile-btn{font-size:17px;}
+
+  .swim-block .ex-inputs{align-items:flex-end;}
 </style>
 </head>
 <body>
@@ -364,25 +501,32 @@
   <div class="streak-pill" id="streakPill" style="display:none;"></div>
 </header>
 
-<div class="race-card" id="raceCard"></div>
-
-<div id="rampCard" style="display:none;"></div>
-
-<div class="summary-row" id="summaryRow"></div>
-
-<div class="nutri-card" id="nutriCard"></div>
-
 <div id="planTabContent">
-  <div class="date-picker-row">
-    <input type="date" id="datePicker">
-    <button class="today-btn" onclick="goToday()">Hoy</button>
+  <div class="weekbar">
+    <button class="wk-btn" id="wkPrev" aria-label="Semana anterior" onclick="shiftWeek(-1)">‹</button>
+    <div class="wk-center">
+      <div class="wk-title" id="wkTitle"></div>
+      <div class="wk-sub" id="wkSub"></div>
+    </div>
+    <button class="wk-btn" id="wkNext" aria-label="Semana siguiente" onclick="shiftWeek(1)">›</button>
   </div>
+  <div class="weekstrip" id="weekStrip"></div>
 
-  <div class="phase-row" id="phaseRow"></div>
+  <div class="race-card" id="raceCard"></div>
 
   <div id="planView">
     <div class="week" id="weekList"></div>
   </div>
+
+  <div class="nutri-card" id="nutriCard"></div>
+  <div id="rampCard" style="display:none;"></div>
+  <div class="summary-row" id="summaryRow"></div>
+
+  <div class="date-picker-row">
+    <input type="date" id="datePicker">
+    <button class="today-btn" onclick="goToday()">Hoy</button>
+  </div>
+  <div class="phase-row" id="phaseRow" style="display:none;"></div>
 </div>
 
 <div id="calView" class="cal-view" style="display:none;"></div>
@@ -784,11 +928,12 @@ tati: {
 }
 };
 
-/* ---------- PLAN VIGENTE: 6 semanas (5/10 → 15/11/2026), test el sábado 14/11 ---------- */
+/* ---------- PLAN VIGENTE: 12 semanas (5/10 → 27/12/2026) · semana 6 = vuelta; semanas 7-12 = bloque fuerza + carrera, natación miércoles y viernes ---------- */
 const FIRST_PHASE = 10;
 const PLAN_START = '2026-10-05';
-const WEEK_RANGES = ['5-11/10','12-18/10','19-25/10','26/10-1/11','2-8/11','9-15/11'];
-const WEEK_TITLES = ['Asimilación','Carga · reentrada','Carga + test 5K','Descarga','Pico','Test 10K'];
+const PLAN_WEEKS = 12;
+const WEEK_RANGES = ['5-11/10','12-18/10','19-25/10','26/10-1/11','2-8/11','9-15/11','16-22/11','23-29/11','30/11-6/12','7-13/12','14-20/12','21-27/12'];
+const WEEK_TITLES = ['Asimilación','Carga · reentrada','Carga + test 5K','Descarga','Pico','Vuelta + salida 10K','Fuerza · base','Carga 1','Carga 2','Descarga','Pico','Test final'];
 
 function E(id, name, target, note, mode){
   const o = { id, name, target };
@@ -997,21 +1142,317 @@ function tatiWeek(n){
   ]);
 }
 
+/* ---------- SEMANA DE VUELTA (9-15/11) · BORJA ---------- */
+function borjaWeekReturn(){
+  return fase(5, [
+    { day:'Lunes', name:'Fuerza tren superior (vuelta)', dur:'45-50 min',
+      focus:'Primera sesión tras unas semanas irregulares: sin buscar marcas. Usa el peso que ves en "última vez" y réstale un 5-10 % si llevas más de 10 días sin pesas; deja 3 reps en reserva en cada serie.',
+      exercises:[
+        E('b_lu_banca','Press banca','3×6 @ RPE 6 · descanso 2 min','Anota peso total y reps totales.'),
+        E('b_lu_remo','Remo con barra','3×8 · descanso 90 s','Espalda plana.'),
+        E('b_lu_mil','Press militar','3×6 @ RPE 6 · descanso 2 min',null),
+        E('b_lu_dom','Dominadas lastradas','3×3-4 estrictas · descanso 2 min','0 kg = peso corporal. Estrictas: sin balanceo.'),
+        E('b_lu_fond','Fondos en paralelas','2×8 · descanso 90 s','0 kg = peso corporal.'),
+        E('b_lu_face','Face pull','3×12 · descanso 60 s',null),
+        E('b_lu_curl','Curl martillo con mancuernas','2×10 · descanso 60 s','Peso total de las dos mancuernas.'),
+        E('b_lu_comba','Comba (finisher)','5 min continuos','Anota los segundos totales de salto.','time'),
+      ]},
+    { day:'Martes', name:'Carrera suave + strides', dur:'30-35 min', focus:'25-30 min fáciles a 5:50-6:30 min/km + 4 strides de 15 s sueltos. Primera salida de la semana: solo coger ritmo, sin mirar el reloj.', simple:true },
+    { swim:true, day:'Miércoles', name:'Fuerza pierna (vuelta)', dur:'45-50 min',
+      focus:'Pierna moderada para recuperar el patrón antes del sábado: 3 series de sentadilla con 3 reps en reserva, sin saltos. Natación por la mañana; si vienes con las piernas cargadas de la piscina, quita una serie.',
+      exercises:[
+        E('b_mi_sent','Sentadilla trasera','3×5 @ RPE 6-7 · descanso 2 min','Usa el peso de tu última sesión (ver "última vez"). Anota peso total y reps totales (15).'),
+        E('b_mi_rdl','Peso muerto rumano','3×8 · bajada de 3 s · descanso 90 s',null),
+        E('b_mi_bulg','Zancadas búlgaras','2×8/pierna · descanso 90 s','Peso de cada mancuerna.','unilateral'),
+        E('b_mi_talon','Elevación de talones a una pierna','3×12/pierna · descanso 60 s','Con mancuerna si te sobra.','unilateral'),
+        E('b_mi_plank','Plancha','3×45 s','Segundos totales.','time'),
+      ]},
+    { day:'Jueves', name:'Carrera suave + core', dur:'35-40 min', focus:'25-30 min fáciles a 5:50-6:30 min/km + 4 progresivos de 20 s. Después, core: 3 rondas de 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof press por lado.', simple:true },
+    { swim:true, day:'Viernes', name:'Recuperación activa · movilidad y core', dur:'20 min', focus:'Víspera de la salida de 10K: 15 min de movilidad de cadera y tobillo + core suave (dead bug, plancha lateral). Nada de pesas ni de carrera; la natación suave del día ya suelta las piernas.', simple:true },
+    { day:'Sábado', name:'Carrera larga · salida 10K sin marca', dur:'≈55-60 min', focus:'10 km en llano, sin objetivo de tiempo: sal a un ritmo cómodo-firme (~5:20-5:40 min/km [estimación]) y, si vas bien, aprieta los últimos 2 km. Este dato calibra los ritmos del bloque nuevo: anota tiempo, parciales y pulsaciones.', simple:true },
+    BORJA_SUN,
+  ]);
+}
+
+/* ---------- BLOQUE NUEVO · BORJA (16/11 → 27/12) ---------- */
+const NB_SC = [
+  { m:'4×6 @ RPE 7 · descanso 2 min', s:'4×8 · descanso 90 s', a:'3×10-12 · descanso 60 s', d:'4×3-4 estrictas · descanso 2 min' },
+  { m:'5×5 @ RPE 7-8 · descanso 2-3 min', s:'4×8 · descanso 90 s', a:'3×10-12 · descanso 60 s', d:'4×4 estrictas · descanso 2 min' },
+  { m:'5×4-5 @ RPE 8 · descanso 3 min', s:'4×6-8 · descanso 90 s', a:'3×8-10 · descanso 60 s', d:'4×4-5 estrictas · descanso 2 min' },
+  { m:'3×5 @ RPE 6 · descanso 2 min', s:'3×8 · descanso 90 s', a:'2×10 · descanso 60 s', d:'3×3-4 estrictas · descanso 2 min' },
+  { m:'4×3-4 @ RPE 8-9 · descanso 3 min', s:'4×6 · descanso 90 s', a:'3×8-10 · descanso 60 s', d:'4×4-5, con lastre ligero si las series anteriores salieron limpias · descanso 2 min' },
+  { m:'Test: 1×5 al tope (RPE 9) tras 2-3 series de calentamiento + 2×5 al 90 % de ese peso · descanso 3 min', s:'3×6 · descanso 90 s', a:'2×10 · descanso 60 s', d:'3 series al máximo de reps estrictas (anota el total) · descanso 2 min' },
+];
+function nbUpper(k){
+  const c = NB_SC[k];
+  const useA = (k!==1 && k!==3);
+  const focus = [
+    'Primera semana completa del bloque. Sube 2,5 kg respecto a tu última sesión limpia solo si todo salió con 2 reps en reserva; si no, repite pesos. Natación miércoles y viernes: hoy el hombro está fresco.',
+    'Día B: hoy manda el press militar y la banca queda de apoyo en inclinado. Sube 2,5 kg en el militar si la semana pasada saliste limpio.',
+    'Carga alta: sube 2,5 kg en banca si las 5 series de la semana pasada fueron limpias. La última rep tiene que costar, sin llegar al fallo.',
+    'Descarga (semana del puente del 8/12): mismos pesos que la semana pasada, menos series. Aprovecha para pulir técnica.',
+    'Pico: pocas reps y pesadas, con descansos largos. Si la barra se frena claramente, quita una serie; no se trata de ir al fallo.',
+    'Test de fuerza: la serie al tope de 5 reps es el dato del bloque (compárala con tu marca de banca anterior). Calienta bien y para antes del fallo real.',
+  ][k];
+  const ex = useA ? [
+    E('b_lu_banca','Press banca', c.m, 'Anota peso total y reps totales.'),
+    E('b_lu_remo','Remo con barra', c.s, 'Espalda plana.'),
+    E('b_lu_mil','Press militar', k===5 ? '3×5 @ RPE 7 · descanso 2 min' : '3×6 @ RPE 7 · descanso 2 min', null),
+    E('b_lu_dom','Dominadas lastradas', c.d, '0 kg = peso corporal. Estrictas: sin balanceo.'),
+    E('b_lu_fond','Fondos en paralelas', k===3 ? '2×8 · descanso 90 s' : '3×8-10 · descanso 90 s', '0 kg = peso corporal.'),
+    E('b_lu_face','Face pull','3×12-15 · descanso 60 s', null),
+    E('b_lu_curl','Curl martillo con mancuernas', c.a, 'Peso total de las dos mancuernas.'),
+    E('b_lu_comba','Comba (finisher)','5 min continuos','Anota los segundos totales de salto.','time'),
+  ] : [
+    E('b_lu_mil','Press militar', c.m, 'Anota peso total y reps totales.'),
+    E('b_lu_dom','Dominadas lastradas', c.d, '0 kg = peso corporal. Estrictas: sin balanceo.'),
+    E('n_lu_incl','Press inclinado con mancuernas', c.s, 'Banco a 30-45°. Peso total de las dos mancuernas.'),
+    E('n_lu_remomano','Remo con mancuerna a un brazo', c.s, 'Peso de la mancuerna; reps por lado.','unilateral'),
+    E('n_lu_lateral','Elevaciones laterales', k===3 ? '2×12 · descanso 60 s' : '3×12-15 · descanso 60 s', 'Peso total de las dos mancuernas. Sin balanceo.'),
+    E('f7_mi_5','Curl con barra EZ', c.a, 'Agarre estrecho, sin balanceo.'),
+    E('f4_mi_6','Extensión de tríceps sobre la cabeza', c.a, 'Codos cerrados. Mancuerna a dos manos o polea con cuerda.'),
+    E('b_lu_comba','Comba (finisher)','5 min continuos','Anota los segundos totales de salto.','time'),
+  ];
+  return { day:'Lunes', name: useA ? 'Fuerza tren superior A · banca y remo' : 'Fuerza tren superior B · militar y dominadas', dur:'55-60 min', focus, exercises: ex };
+}
+
+function nbLegs(k){
+  const swim = true;
+  const base = { swim, day:'Miércoles' };
+  if(k===0) return { ...base, name:'Fuerza pierna A · sentadilla', dur:'55-60 min',
+    focus:'Primera pierna pesada tras la salida del sábado: 4×6 a RPE 7, sin fallo. Si las piernas vienen cargadas del 10K, baja a 3 series de sentadilla. Natación por la mañana.',
+    exercises:[
+      E('b_mi_sent','Sentadilla trasera','4×6 @ RPE 7 · descanso 2 min','Usa el peso de la sesión de vuelta y sube 2,5 kg solo si todo salió limpio. Anota peso total y reps totales (24).'),
+      E('b_mi_rdl','Peso muerto rumano','3×8 · bajada de 3 s · descanso 90 s',null),
+      E('b_mi_bulg','Zancadas búlgaras','3×8/pierna · descanso 90 s','Peso de cada mancuerna.','unilateral'),
+      E('b_mi_talon','Elevación de talones a una pierna','3×12/pierna · descanso 60 s','Con mancuerna.','unilateral'),
+      E('b_mi_plank','Plancha','3×45 s','Segundos totales.','time'),
+    ]};
+  if(k===1) return { ...base, name:'Fuerza pierna B · cadena posterior', dur:'55-60 min',
+    focus:'Día B: peso muerto convencional manda hoy y la sentadilla pasa a goblet, más suave para las rodillas. Espalda neutra en todas las series y sin llegar al fallo.',
+    exercises:[
+      E('n_mi_pm','Peso muerto convencional','4×5 @ RPE 7-8 · descanso 3 min','Anota peso total y reps totales (20).'),
+      E('n_mi_goblet','Sentadilla goblet con kettlebell o mancuerna','3×10 · bajada de 3 s · descanso 90 s',null),
+      E('n_mi_zanc','Zancadas caminando con mancuernas','3×10/pierna · descanso 90 s','Peso de cada mancuerna.','unilateral'),
+      E('n_mi_hip','Hip thrust con barra','3×10 · pausa de 1 s arriba · descanso 90 s','Anota peso total y reps totales.'),
+      E('b_mi_talon','Elevación de talones a una pierna','3×15/pierna · descanso 60 s','Con mancuerna.','unilateral'),
+      E('b_mi_plank','Plancha','3×45 s','Segundos totales.','time'),
+    ]};
+  if(k===2) return { ...base, name:'Fuerza pierna A · sentadilla pesada', dur:'60 min',
+    focus:'Carga alta: sube 2,5 kg en sentadilla si las 4 series de hace dos semanas salieron limpias. Step-ups y búlgaras son lo más parecido a una subida de montaña.',
+    exercises:[
+      E('b_mi_sent','Sentadilla trasera','5×4-5 @ RPE 8 · descanso 3 min','Anota peso total y reps totales.'),
+      E('b_mi_step','Step-ups con mancuernas','4×8/pierna · descanso 90 s','Cajón o banco a la altura de la rodilla; controla la bajada.','unilateral'),
+      E('b_mi_bulg','Zancadas búlgaras','3×8/pierna · descanso 90 s','Peso de cada mancuerna.','unilateral'),
+      E('b_mi_rdl','Peso muerto rumano','3×8 · bajada de 3 s · descanso 90 s',null),
+      E('b_mi_salto','Saltos al cajón','4×5 · descanso 60 s','Altura cómoda, baja andando. Calidad sobre cantidad.'),
+      E('b_mi_talon','Elevación de talones a una pierna','3×15/pierna · descanso 60 s','Con mancuerna.','unilateral'),
+    ]};
+  if(k===3) return { ...base, name:'Fuerza pierna B · descarga', dur:'45-50 min',
+    focus:'Descarga: peso muerto y goblet con 20 % menos carga que la semana B anterior y menos series. Sin saltos.',
+    exercises:[
+      E('n_mi_pm','Peso muerto convencional','3×4 @ RPE 6 · descanso 2 min','Anota peso total y reps totales (12).'),
+      E('n_mi_goblet','Sentadilla goblet con kettlebell o mancuerna','2×10 · bajada de 3 s · descanso 90 s',null),
+      E('n_mi_zanc','Zancadas caminando con mancuernas','2×8/pierna · descanso 90 s','Peso de cada mancuerna.','unilateral'),
+      E('b_mi_talon','Elevación de talones a una pierna','2×12/pierna · descanso 60 s',null,'unilateral'),
+      E('b_mi_plank','Plancha','3×45 s','Segundos totales.','time'),
+    ]};
+  if(k===4) return { ...base, name:'Fuerza pierna A · pico', dur:'60 min',
+    focus:'Pico del bloque: serie al tope de 3 reps en sentadilla (RPE 9, sin fallo) y 3×3 al 90 % de ese peso. Es tu dato de fuerza de pierna; el sábado es la última tirada larga, así que no añadas nada más.',
+    exercises:[
+      E('b_mi_sent','Sentadilla trasera','1×3 al tope (RPE 9) + 3×3 al 90 % · descanso 3 min','Calienta con 4-5 series progresivas. Anota peso total y reps totales (12).'),
+      E('b_mi_step','Step-ups con mancuernas','3×8/pierna · descanso 90 s','Controla la bajada.','unilateral'),
+      E('b_mi_bulg','Zancadas búlgaras','3×6-8/pierna · descanso 90 s','Peso de cada mancuerna; más pesado que de costumbre.','unilateral'),
+      E('b_mi_rdl','Peso muerto rumano','3×6 · bajada de 3 s · descanso 2 min',null),
+      E('b_mi_talon','Elevación de talones a una pierna','3×12/pierna · descanso 60 s','Con mancuerna.','unilateral'),
+    ]};
+  return { ...base, name:'Fuerza pierna (ligera pre-test)', dur:'35-40 min',
+    focus:'El sábado es el test de 10K: hoy solo activar. Velocidad de barra, sin fatiga, sin agujetas. Si el 23/12 no puedes nadar por la mañana, hazlo otro día de la semana.',
+    exercises:[
+      E('b_mi_sent','Sentadilla trasera','3×4 @ RPE 6 · descanso 2 min','Ligero y rápido. Anota peso total y reps totales (12).'),
+      E('b_mi_rdl','Peso muerto rumano','2×6 · descanso 90 s',null),
+      E('b_mi_talon','Elevación de talones a una pierna','2×12/pierna · descanso 60 s',null,'unilateral'),
+      E('b_mi_plank','Plancha','3×40 s','Segundos totales.','time'),
+    ]};
+}
+
+const NB_TUE = [
+  { name:'Carrera · fartlek', dur:'40 min', focus:'10 min fácil + 8×1 min a RPE 7 (~4:50-5:00 min/km [estimación]) con 1 min 30 s de trote entre repeticiones + 10 min fácil. Primer día de calidad del bloque: terminas con ganas de más.' },
+  { name:'Carrera · cuestas', dur:'45 min', focus:'15 min fácil + 6×90 s en cuesta (6-10 %) a RPE 8, bajando trotando + 10 min fácil. Zancada corta y brazos activos; si te pasas de umbral, camina rápido el tramo final.' },
+  { name:'Carrera · tempo', dur:'45-50 min', focus:'10 min fácil + 2×10 min a ritmo tempo (~5:15-5:25 min/km [estimación], RPE 7) con 3 min de trote entre bloques + 8 min fácil. Si el segundo bloque se te va, acórtalo a 8 min.' },
+  { name:'Carrera · series cortas (descarga)', dur:'35-40 min', focus:'Descarga: 15 min fácil + 5×1 min a RPE 8 con 90 s de trote + 10 min fácil. No añadas repeticiones.' },
+  { name:'Carrera · series a ritmo 10K', dur:'50-55 min', focus:'15 min fácil + 5×1 km a ~4:55 min/km [estimación] (rec. 2 min de trote) + 10 min fácil. Es el ritmo al que quieres correr el test: si la tercera ya se va, termina con 4.' },
+  { name:'Carrera de activación', dur:'30-35 min', focus:'4 km fáciles + 5×1 min a ritmo de test (~5:00 min/km) con 1 min 30 s de trote + 4 strides. Solo activar piernas para el sábado.' },
+];
+const NB_THU = [
+  { name:'Carrera suave + core', dur:'40 min', focus:'30 min fáciles a 5:50-6:30 min/km. Después, core: 3 rondas de 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof press por lado.' },
+  { name:'Carrera suave + kettlebell', dur:'45 min', focus:'30 min fáciles a 5:50-6:30 min/km. Después 10 min de kettlebell: 5 rondas de 8 swings a dos manos + 4 cleans por lado + 30 s de plancha. Peso ligero, técnica limpia; anota el peso en el comentario.' },
+  { name:'Carrera suave + progresivos', dur:'40-45 min', focus:'30 min fáciles + 4 progresivos de 20 s (acelera sin sprintar, 40 s andando entre ellos). Después, 3 rondas de core: 30 s dead bug · 30 s plancha lateral por lado · 10 farmer carry.' },
+  { name:'Carrera suave', dur:'25-30 min', focus:'Descarga: 25 min muy fáciles a 6:00-6:30 min/km. Sin core pesado.' },
+  { name:'Carrera suave + core', dur:'40-45 min', focus:'30 min fáciles a 5:50-6:30 min/km + 4 progresivos de 20 s. Después, core: 3 rondas de 30 s dead bug · 30 s plancha lateral por lado · 10 Pallof press por lado.' },
+  { name:'Carrera suave', dur:'20-25 min', focus:'20 min fáciles + 4 strides. Piernas frescas para el sábado: nada de core pesado.' },
+];
+const NB_FRI = [
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'AMRAP 15 min: 5 dominadas (o 8 remos con mancuerna por lado) · 10 flexiones · 12 sit-ups · plancha 20 s. Sin piernas: mañana toca tirada. Anota rondas.' },
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'EMOM 20 min, 5 vueltas de 4 estaciones: min1 10 press de mancuernas alternos · min2 8 remos con mancuerna por lado · min3 12 flexiones · min4 40 s de plancha. Anota pesos.' },
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'5 rondas for time (tope 20 min): 5 dominadas (o 10 remos) · 10 fondos · 15 sit-ups · 30 saltos de comba. Sin piernas. Anota el tiempo.' },
+  { name:'WOD tren superior y core (descarga)', dur:'20-25 min', focus:'AMRAP 12 min: 8 flexiones · 8 remos con mancuerna por lado · 10 sit-ups. Anota rondas.' },
+  { name:'WOD tren superior y core', dur:'25-30 min', focus:'For time (tope 20 min): 30-20-10 de flexiones · remos con mancuerna (por lado) · sit-ups, con 1 min de comba entre rondas. Sin piernas. Anota el tiempo y los pesos.' },
+  { name:'Recuperación activa · movilidad y core', dur:'20 min', focus:'Víspera del test: 15 min de movilidad de cadera y tobillo + core suave (dead bug, plancha lateral). Nada de carrera ni de pesas. Si el 25/12 no hay piscina, nada otro día.' },
+];
+const NB_SAT = [
+  { name:'Carrera larga con desnivel', dur:'60-70 min', focus:'10 km, +150 m D+. Fácil (5:30-6:00 min/km en llano); en las subidas, esfuerzo controlado: tienes que poder hablar. Mejor en tierra o césped que en asfalto. Anota km, desnivel y sensaciones.' },
+  { name:'Carrera larga con desnivel', dur:'70-80 min', focus:'12 km, +250 m D+. Fácil, con 3 subidas de 3 min a RPE 8 repartidas. Si te pasas de umbral, camina rápido: lo que importa es el ritmo en la subida.' },
+  { name:'Carrera larga con desnivel', dur:'75-85 min', focus:'13 km, +300 m D+. Subidas a ritmo de carrera (RPE 7-8) y recuperas en las bajadas. Lleva agua.' },
+  { name:'Carrera larga con desnivel', dur:'45-55 min', focus:'Descarga: 8 km, +100 m D+, todo fácil.' },
+  { name:'Carrera larga con desnivel', dur:'85-95 min', focus:'14 km, +350 m D+. Subidas a ritmo de carrera (RPE 7-8). Última tirada larga antes del test: no la alargues.' },
+  { name:'🏁 Carrera test 10K en llano', dur:'≈55 min', focus:'Objetivo ≤50:00 (5:00 min/km) [estimación; se confirma con la salida del 14/11: si fue claramente más lenta, ajusta a ≤52:00]. Calienta 15 min + 4 strides. Km 1-2 a ~5:06, km 3-8 a 4:58-5:00, últimos 2 km a lo que quede. Anota tiempo, parciales y pulsaciones.' },
+];
+function borjaBlockWeek(k){
+  const tu = NB_TUE[k], th = NB_THU[k], vi = NB_FRI[k], sa = NB_SAT[k];
+  return fase(6+k, [
+    nbUpper(k),
+    { day:'Martes', name:tu.name, dur:tu.dur, focus:tu.focus, simple:true },
+    nbLegs(k),
+    { day:'Jueves', name:th.name, dur:th.dur, focus:th.focus, simple:true },
+    { swim:true, day:'Viernes', name:vi.name, dur:vi.dur, focus:vi.focus, simple:true },
+    { day:'Sábado', name:sa.name, dur:sa.dur, focus:sa.focus, simple:true },
+    BORJA_SUN,
+  ]);
+}
+
+/* ---------- TATI · SEMANA DE VUELTA Y BLOQUE NUEVO ---------- */
+const TA_CFG = [
+  { s:'4×8 @ RPE 7', h:'4×10', r:'3×10', b:'3×8/pierna', k:'3×12/pierna', note:'Primera semana de carga del bloque: deja 2 reps en reserva. Si las piernas vienen cargadas del sábado, quita una serie de sentadilla.' },
+  { s:'4×8 @ RPE 7', h:'4×10', r:'3×8', b:'3×10/pierna', k:'3×12/pierna', note:'Día B (más glúteo, menos sentadilla): sube carga en hip thrust si la semana pasada te sobraron reps.' },
+  { s:'4×6-8 @ RPE 8', h:'4×8', r:'3×8', b:'3×8/pierna', k:'3×12/pierna', note:'Carga alta: las últimas 2 reps tienen que costar.' },
+  { s:'3×6 @ RPE 6', h:'3×10', r:'2×8', b:'2×8/pierna', k:'2×12/pierna', note:'Descarga: misma técnica, menos series.' },
+  { s:'4×5 @ RPE 8-9', h:'4×6-8', r:'3×6', b:'3×6-8/pierna', k:'3×10/pierna', note:'Pico del bloque: carga alta, descansos de 2-3 min, buena técnica.' },
+  { s:'3×5 @ RPE 6', h:'3×8', r:'2×8', b:'2×8/pierna', k:'2×12/pierna', note:'Semana del test: ligero, sin agujetas para el sábado.' },
+];
+function tiA(cfg, odd, name){
+  const ex = odd ? [
+    E('t_lu_sumo','Sentadilla sumo con mancuerna', cfg.s, 'Mancuerna entre las piernas, pies abiertos. Peso total.'),
+    E('t_lu_hip','Hip thrust', cfg.h, 'Pausa de 1 s arriba.'),
+    E('t_lu_zanc','Zancadas caminando con mancuernas', cfg.b, 'Peso de cada mancuerna; 0 kg = peso corporal.','unilateral'),
+    E('t_lu_abd','Abducción de cadera en polea o con goma', cfg.k, null,'unilateral'),
+    E('t_lu_plank','Plancha', '3×30-40 s', 'Segundos totales.','time'),
+  ] : [
+    E('t_lu_sent','Sentadilla trasera', cfg.s, null),
+    E('t_lu_hip','Hip thrust', cfg.h, 'Pausa de 1 s arriba.'),
+    E('t_lu_rdl','Peso muerto rumano', cfg.r, 'Bajada de 3 s.'),
+    E('t_lu_bulg','Zancadas búlgaras', cfg.b, 'Peso de cada mancuerna; 0 kg = peso corporal.','unilateral'),
+    E('t_lu_kick','Patada de glúteo en polea', cfg.k, null,'unilateral'),
+    E('t_lu_plank','Plancha', '3×30-40 s', 'Segundos totales.','time'),
+  ];
+  return { day:'Lunes', name: name || (odd ? 'Fuerza glúteo y pierna A2' : 'Fuerza glúteo y pierna A'), dur:'50-55 min', focus: cfg.note + ' Anota peso total y reps totales.', exercises: ex };
+}
+const TB_CFG = [
+  { pm:'3×6 @ RPE 7', st:'3×8/pierna', pu:'3×12/pierna', ho:'3×10', note:'Sube carga si la semana pasada te sobraron reps.' },
+  { pm:'4×5 @ RPE 7-8', st:'3×8/pierna', pu:'3×12/pierna', ho:'3×10', note:'Sube carga en peso muerto si las series salieron limpias.' },
+  { pm:'4×5 @ RPE 8', st:'3×8/pierna', pu:'3×12/pierna', ho:'3×8-10', note:'Carga alta: buena técnica y espalda neutra.' },
+  { pm:'3×5 @ RPE 6', st:'2×8/pierna', pu:'2×12/pierna', ho:'2×10', note:'Descarga: menos series, no busques fatiga.' },
+  { pm:'4×4 @ RPE 8-9', st:'3×6-8/pierna', pu:'3×10/pierna', ho:'3×8', note:'Pico del bloque: carga alta, descansos largos.' },
+  { pm:'3×4 @ RPE 6', st:'2×8/pierna', pu:'2×12/pierna', ho:'2×10', note:'Semana del test: ligero, sin agujetas para el sábado.' },
+];
+function tiB(c, vuelta){
+  return { day:'Jueves', name:'Fuerza glúteo y tirón B', dur:'50-55 min', focus: (vuelta ? 'Vuelta tras semanas irregulares: sin marcas, 3 reps en reserva. ' : '') + c.note,
+    exercises:[
+      E('t_ju_pm','Peso muerto convencional', c.pm, 'Anota peso total y reps totales.'),
+      E('t_ju_step','Step-ups con mancuernas', c.st, 'Banco o cajón a la altura de la rodilla; controla la bajada.','unilateral'),
+      E('t_ju_puente','Puente de glúteo a una pierna', c.pu, null,'unilateral'),
+      E('t_ju_dom','Dominadas asistidas / remo polea', c.ho, null),
+      E('t_ju_face','Face pull', '3×15', null),
+      E('t_ju_talon','Elevación de talones', '3×15', 'Escalón o suelo; con mancuerna si te sobra.'),
+    ]};
+}
+function tiWed(k, vuelta){
+  const light = (k===3 || k===5);
+  return { swim:true, day:'Miércoles', name:'Fuerza tren superior y core (corta)', dur:'30-35 min',
+    focus: (vuelta ? 'Sesión corta para coger ritmo. ' : '') + 'Natación por la mañana: si vienes con los hombros cargados de la piscina, quita una serie. Peso con el que te sobren 2-3 reps.',
+    exercises:[
+      E('t_mi_flex','Flexiones (en banco o rodillas si hace falta)', light ? '2×8-10' : '3×8-12', 'Reps totales.'),
+      E('t_mi_remo','Remo con mancuerna a un brazo', light ? '2×10/lado' : '3×10/lado', 'Peso de la mancuerna.','unilateral'),
+      E('t_mi_press','Press de hombro con mancuernas', light ? '2×10' : '3×10', 'Peso total de las dos mancuernas.'),
+      E('t_mi_deadbug','Dead bug', '3×10/lado', null,'unilateral'),
+      E('t_mi_lateral','Plancha lateral', '3×30 s/lado', 'Segundos totales.','time'),
+    ]};
+}
+function tiFri(k, vuelta){
+  const light = (k===3 || k===5);
+  return { swim:true, day:'Viernes', name:'Glúteo y core en casa', dur:'25 min', focus: (vuelta ? 'Víspera de la salida: ligero, sin pasarte de RPE 5. ' : 'Sesión de glúteo sin carga pesada, a RPE 6: mañana toca tirada. ') + 'La natación de la mañana cuenta como calentamiento.',
+    exercises:[
+      E('t_vi_hip','Hip thrust', light ? '2×15' : '3×15', 'Peso corporal o con goma sobre las rodillas.'),
+      E('t_vi_abd','Abducción de cadera con goma', light ? '2×15/lado' : '3×15/lado', null,'unilateral'),
+      E('t_vi_deadbug','Dead bug', '3×10/lado', null,'unilateral'),
+      E('t_vi_lateral','Plancha lateral', '3×30 s/lado', 'Segundos totales.','time'),
+    ]};
+}
+const TB_TUE = [
+  { name:'Carrera · fartlek', dur:'35-40 min', focus:'10 min fácil + 6×1 min a ~6:45 min/km [estimación] (rec. 90 s andando o trotando) + 8 min fácil. Rápido pero controlado.' },
+  { name:'Carrera · cuestas', dur:'35-40 min', focus:'10 min fácil + 6×40 s en cuesta a RPE 8, bajando andando + 8 min fácil. Zancada corta y brazos activos.' },
+  { name:'Carrera · tempo', dur:'40 min', focus:'10 min fácil + 2×8 min a ~7:00 min/km [estimación] (RPE 7) con 2 min de trote entre bloques + 8 min fácil.' },
+  { name:'Carrera fácil (descarga)', dur:'25-30 min', focus:'Descarga: 4 km fáciles (7:20-7:50 min/km), sin strides.' },
+  { name:'Carrera · series', dur:'40-45 min', focus:'10 min fácil + 5×800 m a ~6:40 min/km [estimación] (rec. 2 min andando o trotando) + 8 min fácil. Si la cuarta repetición ya se va, termina con 4.' },
+  { name:'Carrera de activación', dur:'25-30 min', focus:'3-4 km fáciles + 4 strides de 20 s. Solo soltar piernas para el test del sábado.' },
+];
+const TB_SAT = [
+  { name:'Carrera larga fácil', dur:'45 min', focus:'6 km fáciles (7:20-7:50 min/km). Anota cómo van piernas y tobillos.' },
+  { name:'Carrera fartlek', dur:'45-50 min', focus:'10 min fácil + 6×1 min rápido (~6:30 min/km) con 2 min fácil entre medias + 8 min fácil (≈7 km).' },
+  { name:'Carrera de series', dur:'55-60 min', focus:'2 km fáciles + 4×1 km a ~6:45 min/km (rec. 2 min andando o trotando) + 1,5 km fáciles (≈8 km en total). Si la tercera ya se va de ritmo, termina con 3.' },
+  { name:'Carrera larga fácil (descarga)', dur:'30-35 min', focus:'Descarga: 5 km fáciles (7:20-7:50 min/km).' },
+  { name:'Carrera de series', dur:'55-60 min', focus:'2 km fáciles + 5×1 km a ~6:40 min/km [estimación] (rec. 2 min andando o trotando) + 1 km fácil (≈8 km en total).' },
+  { name:'🏁 Carrera test 8 km en llano', dur:'≈55 min', focus:'Objetivo ≤56:00 (7:00 min/km) [estimación; se confirma con la salida del 14/11]. Calienta 10 min + 4 strides. Km 1-2 a ~7:10, km 3-6 a ~6:55, últimos 2 km a lo que quede. Anota tiempo y sensaciones.' },
+];
+function tatiWeekReturn(){
+  const tu = { name:'Carrera suave + strides', dur:'25-30 min', focus:'3-4 km fáciles (7:20-7:50 min/km) + 4 strides de 15 s sueltos. Primera salida de la semana: sin forzar.' };
+  const sa = { name:'Carrera larga · salida 8 km sin marca', dur:'≈55-60 min', focus:'8 km en llano, sin objetivo de tiempo: ritmo cómodo-firme (~7:00-7:20 min/km [estimación]) y, si vas bien, aprieta los últimos 2 km. Este dato calibra los ritmos del bloque nuevo: anota tiempo y sensaciones.' };
+  return fase(5, [
+    tiA({ s:'3×8 @ RPE 6', h:'3×10', r:'2×10', b:'2×8/pierna', k:'2×12/pierna', note:'Vuelta tras semanas irregulares: sin buscar marcas, deja 3 reps en reserva.' }, false, 'Fuerza glúteo y pierna A (vuelta)'),
+    { day:'Martes', name:tu.name, dur:tu.dur, focus:tu.focus, simple:true },
+    tiWed(5, true),
+    tiB(TB_CFG[5], true),
+    tiFri(5, true),
+    { day:'Sábado', name:sa.name, dur:sa.dur, focus:sa.focus, simple:true },
+    TATI_SUN,
+  ]);
+}
+function tatiBlockWeek(k){
+  const tu = TB_TUE[k], sa = TB_SAT[k];
+  return fase(6+k, [
+    tiA(TA_CFG[k], (k%2===1)),
+    { day:'Martes', name:tu.name, dur:tu.dur, focus:tu.focus, simple:true },
+    tiWed(k, false),
+    tiB(TB_CFG[k], false),
+    tiFri(k, false),
+    { day:'Sábado', name:sa.name, dur:sa.dur, focus:sa.focus, simple:true },
+    TATI_SUN,
+  ]);
+}
+
 const PLANS = { borja:{}, tati:{} };
-for(let n=0; n<6; n++){
+for(let n=0; n<5; n++){
   PLANS.borja[FIRST_PHASE+n] = borjaWeek(n);
   PLANS.tati[FIRST_PHASE+n] = tatiWeek(n);
+}
+PLANS.borja[FIRST_PHASE+5] = borjaWeekReturn();
+PLANS.tati[FIRST_PHASE+5] = tatiWeekReturn();
+for(let k=0; k<6; k++){
+  PLANS.borja[FIRST_PHASE+6+k] = borjaBlockWeek(k);
+  PLANS.tati[FIRST_PHASE+6+k] = tatiBlockWeek(k);
 }
 
 function phaseForDate(dateKey){
   const monday = mondayOfWeek(dateKey);
   const start = new Date(PLAN_START + 'T00:00:00');
   const weeks = Math.round((monday - start) / (7*86400000));
-  return FIRST_PHASE + Math.max(0, Math.min(5, weeks));
+  return FIRST_PHASE + Math.max(0, Math.min(PLAN_WEEKS-1, weeks));
 }
 
-const RACE_DATE = '2026-11-14';
-const RACE_TARGET = { borja: 'Test 10K llano · ≤50:00', tati: 'Test 8 km llano · ≤56:00' };
+const RACES = [
+  { date:'2026-11-14', borja:'Salida 10K en llano · sin marca', tati:'Salida 8 km en llano · sin marca' },
+  { date:'2026-12-26', borja:'Test 10K en llano · ≤50:00', tati:'Test 8 km en llano · ≤56:00' },
+];
 const USER_LABEL = { borja: 'Borja', tati: 'Tati' };
 const RUN_RAMP = {
   borja: [
@@ -1020,7 +1461,13 @@ const RUN_RAMP = {
     { date:'2026-10-24', km:12, note:'+250 m D+' },
     { date:'2026-10-31', km:8, note:'descarga, +100 m D+' },
     { date:'2026-11-07', km:14, note:'+350 m D+' },
-    { date:'2026-11-14', km:10, note:'🏁 test 10K en llano' },
+    { date:'2026-11-14', km:10, note:'salida 10K en llano, sin marca' },
+    { date:'2026-11-21', km:10, note:'+150 m D+' },
+    { date:'2026-11-28', km:12, note:'+250 m D+' },
+    { date:'2026-12-05', km:13, note:'+300 m D+' },
+    { date:'2026-12-12', km:8, note:'descarga, +100 m D+' },
+    { date:'2026-12-19', km:14, note:'+350 m D+' },
+    { date:'2026-12-26', km:10, note:'🏁 test 10K en llano' },
   ],
   tati: [
     { date:'2026-10-10', km:5, note:'fácil' },
@@ -1028,7 +1475,13 @@ const RUN_RAMP = {
     { date:'2026-10-24', km:6, note:'fartlek' },
     { date:'2026-10-31', km:5, note:'descarga' },
     { date:'2026-11-07', km:8, note:'4×1 km' },
-    { date:'2026-11-14', km:8, note:'🏁 test 8 km en llano' },
+    { date:'2026-11-14', km:8, note:'salida 8 km en llano, sin marca' },
+    { date:'2026-11-21', km:6, note:'fácil' },
+    { date:'2026-11-28', km:7, note:'fartlek' },
+    { date:'2026-12-05', km:8, note:'4×1 km' },
+    { date:'2026-12-12', km:5, note:'descarga' },
+    { date:'2026-12-19', km:8, note:'5×1 km' },
+    { date:'2026-12-26', km:8, note:'🏁 test 8 km en llano' },
   ],
 };
 
@@ -1042,26 +1495,29 @@ let currentUser = null;
 function uk(key){ return currentUser + ':' + key; }
 function plan(){ return PLANS[currentUser]; }
 
+let rampOpen = false, nutriOpen = false;
+
+function nextRace(){
+  const today = todayStr();
+  return RACES.find(r => r.date >= today) || null;
+}
 function renderRaceCard(){
   const card = document.getElementById('raceCard');
+  const race = nextRace();
+  if(!race){ card.style.display = 'none'; return; }
   const today = new Date(todayStr()+'T00:00:00');
-  const race = new Date(RACE_DATE+'T00:00:00');
-  const diffDays = Math.round((race - today) / 86400000);
-  const label = USER_LABEL[currentUser];
-  const target = RACE_TARGET[currentUser];
-  if(diffDays < 0){
-    card.style.display = 'none';
-    return;
-  }
+  const rd = new Date(race.date+'T00:00:00');
+  const diffDays = Math.round((rd - today) / 86400000);
+  const when = rd.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
   card.style.display = 'flex';
   card.innerHTML = `
     <div class="race-left">
-      <div class="race-title">🎯 ${target}</div>
-      <div class="race-sub">${label} · sábado 14 de noviembre</div>
+      <div class="race-title">🎯 ${race[currentUser]}</div>
+      <div class="race-sub">${USER_LABEL[currentUser]} · ${when}</div>
     </div>
     <div style="text-align:center;">
-      <div class="race-days">${diffDays}</div>
-      <div class="race-days-label">días</div>
+      <div class="race-days">${diffDays===0 ? 'HOY' : diffDays}</div>
+      ${diffDays===0 ? '' : '<div class="race-days-label">días</div>'}
     </div>`;
 }
 
@@ -1074,24 +1530,23 @@ function renderRampCard(){
     card.style.display = 'none';
     return;
   }
-  const nextDate = future[0].date;
-  const rows = ramp.map(r=>{
+  const next = future[0];
+  const rows = ramp.filter(r => r.date >= '2026-11-07').map(r=>{
     const isPast = r.date < today;
-    const isNext = r.date === nextDate;
-    const label = formatDateShort(r.date);
+    const isNext = r.date === next.date;
     return `
       <div class="ramp-row ${isNext?'next':''}" style="${isPast?'opacity:0.45;':''}">
-        <span class="ramp-date">${label}${r.note ? ' · <span class="ramp-note">'+r.note+'</span>' : ''}</span>
+        <span class="ramp-date">${formatDateShort(r.date)}${r.note ? ' · <span class="ramp-note">'+r.note+'</span>' : ''}</span>
         <span class="ramp-km">${r.km} km</span>
       </div>`;
   }).join('');
   card.style.display = 'block';
   card.innerHTML = `
-    <div class="ramp-card">
-      <div class="ramp-title">📈 Tiradas del sábado hasta el test</div>
-      <div class="ramp-sub">Distancia objetivo de la salida larga de cada sábado</div>
+    <details class="fold" ${rampOpen?'open':''}>
+      <summary><span>📈 Tiradas del sábado</span><span class="fold-count">Próxima: ${formatDateShort(next.date)} · ${next.km} km</span></summary>
       <div class="ramp-list">${rows}</div>
-    </div>`;
+    </details>`;
+  card.querySelector('details').addEventListener('toggle', (e)=>{ rampOpen = e.target.open; });
 }
 
 function initProfile(){
@@ -1202,11 +1657,13 @@ async function renderNutriCard(){
       <input type="number" inputmode="decimal" step="0.5" id="sleepInput" value="${sleepVal}" style="width:56px; background:var(--card2); border:0.5px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; padding:7px; text-align:center;">
     </div>`;
 
+  const nDone = items.filter(it=>!!nutri[it.key]).length;
   card.innerHTML = `
-    <div class="nutri-title">🍽️ Hoy</div>
-    ${rows}
-    ${sleepRow}
-    `;
+    <details class="fold" ${nutriOpen?'open':''}>
+      <summary><span>🍽️ Hábitos ${dateKey===todayStr() ? 'de hoy' : 'del '+formatDateShort(dateKey)}</span><span class="fold-count">${nDone}/${items.length}</span></summary>
+      <div class="fold-body">${rows}${sleepRow}</div>
+    </details>`;
+  card.querySelector('details').addEventListener('toggle', (e)=>{ nutriOpen = e.target.open; });
 
   const sleepInput = document.getElementById('sleepInput');
   if(sleepInput){
@@ -1225,6 +1682,8 @@ async function renderNutriCard(){
     el.onclick = async ()=>{
       el.classList.toggle('done');
       el.textContent = el.classList.contains('done') ? '✓' : '';
+      const cnt = card.querySelector('.fold-count');
+      if(cnt) cnt.textContent = card.querySelectorAll('.nutri-check.done').length + '/' + card.querySelectorAll('.nutri-check').length;
       const key = el.dataset.nkey;
       let n = {};
       try{
@@ -1284,7 +1743,7 @@ function goToday(){
   phaseManual = false;
   currentDate = todayStr();
   document.getElementById('datePicker').value = currentDate;
-  renderWeek();
+  renderWeek({ scroll:true });
 }
 
 async function loadLog(dateKey){
@@ -1437,48 +1896,104 @@ async function renderSummary(){
   }
 }
 
-async function renderWeek(){
+const WD_FULL = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const WD_LET = ['L','M','X','J','V','S','D'];
+function fmtDM(dateKey){ return `${parseInt(dateKey.slice(8),10)}/${parseInt(dateKey.slice(5,7),10)}`; }
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function planMondayBounds(){
+  const first = new Date(PLAN_START + 'T00:00:00');
+  const last = new Date(first); last.setDate(last.getDate() + 7*(PLAN_WEEKS-1));
+  return { first, last };
+}
+function shiftWeek(delta){
+  const d = new Date(currentDate + 'T00:00:00');
+  d.setDate(d.getDate() + 7*delta);
+  const nd = toLocalISO(d);
+  const { first, last } = planMondayBounds();
+  const mon = mondayOfWeek(nd);
+  if(mon < first || mon > last) return;
+  phaseManual = false;
+  currentDate = nd;
+  document.getElementById('datePicker').value = nd;
+  renderWeek();
+}
+function buildWeekBar(){
+  const n = currentPhase - FIRST_PHASE;
+  document.getElementById('wkTitle').textContent = `Semana ${n+1} de ${PLAN_WEEKS} · ${WEEK_TITLES[n]}`;
+  document.getElementById('wkSub').textContent = WEEK_RANGES[n];
+  const { first, last } = planMondayBounds();
+  const mon = mondayOfWeek(currentDate);
+  document.getElementById('wkPrev').disabled = !(mon > first);
+  document.getElementById('wkNext').disabled = !(mon < last);
+}
+function buildWeekStrip(days){
+  const strip = document.getElementById('weekStrip');
+  strip.innerHTML = '';
+  days.forEach((d, i)=>{
+    const dateKey = dateForWeekIdx(i);
+    const chip = document.createElement('button');
+    chip.className = 'wk-chip ' + dayTypeClass(d) + (dateKey===todayStr() ? ' today' : '');
+    chip.id = 'chip_' + i;
+    chip.setAttribute('aria-label', `${WD_FULL[i]} ${fmtDM(dateKey)}: ${d.name}`);
+    chip.innerHTML = `<span class="wk-l">${WD_LET[i]}</span><span class="wk-n">${parseInt(dateKey.slice(8),10)}</span><span class="wk-i">${dayIcon(d)}${d.swim?'🏊':''}</span>`;
+    chip.onclick = ()=> openDay(i, true);
+    strip.appendChild(chip);
+  });
+}
+function openDay(i, scroll){
+  const card = document.getElementById('card_' + i);
+  const body = document.getElementById(`body_${currentPhase}_${i}`);
+  if(!card || !body) return;
+  card.classList.add('open');
+  body.classList.add('open');
+  if(scroll) card.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+async function renderWeek(opts){
+  opts = opts || {};
   if(!phaseManual){
     const auto = phaseForDate(currentDate);
     if(auto !== currentPhase || !document.querySelector('.phase-btn')){ currentPhase = auto; buildPhaseRow(); }
   }
-  await renderSummary();
-  await renderNutriCard();
-  renderRaceCard();
-  renderRampCard();
+  buildWeekBar();
   const container = document.getElementById('weekList');
   container.innerHTML = '';
   const days = plan()[currentPhase].days;
   const todayIdx = weekdayIndexFromDate(currentDate);
+  const isTodayWeek = mondayOfWeek(currentDate).getTime() === mondayOfWeek(todayStr()).getTime();
+  buildWeekStrip(days);
 
   for(let i=0;i<days.length;i++){
     const d = days[i];
-    const card = document.createElement('div');
-    card.className = 'day-card ' + dayTypeClass(d) + (i===todayIdx && currentDate===todayStr() ? ' is-today' : '');
-
     const dateKeyForDay = dateForWeekIdx(i);
-    let focusText = d.focus;
+    const isToday = dateKeyForDay === todayStr();
+    const card = document.createElement('div');
+    card.id = 'card_' + i;
+    card.className = 'day-card ' + dayTypeClass(d) + (isToday ? ' is-today' : '');
+
+    let runChip = '';
     if(dayTypeClass(d)==='type-carrera'){
       const rt = runTargetFor(dateKeyForDay);
-      if(rt){
-        focusText += ` · 🎯 Objetivo: ${rt.km} km${rt.note ? ' — '+rt.note : ''}`;
-      }
+      if(rt) runChip = `<span class="chip chip-run">🎯 ${rt.km} km${rt.note ? ' · '+escapeHtml(rt.note) : ''}</span>`;
     }
 
     const head = document.createElement('div');
     head.className = 'day-head';
     head.innerHTML = `
-      <div class="day-left">
-        <span class="day-icon">${dayIcon(d)}</span>
-        <div>
-          <div class="day-name" id="dayname_${i}">${d.day} · ${d.name}${d.swim?' · 🏊':''}</div>
-          <div class="day-focus">${focusText}</div>
+      <div class="day-main">
+        <div class="day-meta"><span>${WD_FULL[i]} · ${fmtDM(dateKeyForDay)}</span>${isToday ? '<span class="hoy-pill">HOY</span>' : ''}</div>
+        <div class="day-title"><span class="day-icon">${dayIcon(d)}</span><span class="day-name" id="dayname_${i}">${d.name}</span></div>
+        <div class="day-chips">
+          <span class="chip">⏱ ${d.dur}</span>
+          ${d.swim ? '<span class="chip chip-swim">🏊 Natación 45 min · por la mañana</span>' : ''}
+          ${runChip}
         </div>
+        <div class="day-focus">${d.focus}</div>
       </div>
       <div class="day-right">
-        <span class="day-dur">${d.swim?'🏊 45 min + ':''}${d.dur}</span>
-        ${i===todayIdx && currentDate===todayStr() ? '<div class="today-dot"></div>' : ''}
         <div class="check-badge" id="badge_${currentPhase}_${i}"></div>
+        <span class="chev">▾</span>
       </div>`;
     const body = document.createElement('div');
     body.className = 'day-body';
@@ -1486,9 +2001,10 @@ async function renderWeek(){
 
     head.onclick = ()=>{
       body.classList.toggle('open');
+      card.classList.toggle('open', body.classList.contains('open'));
     };
 
-    if(i===todayIdx){ body.classList.add('open'); }
+    if(i===todayIdx){ body.classList.add('open'); card.classList.add('open'); }
 
     card.appendChild(head);
     card.appendChild(body);
@@ -1496,6 +2012,20 @@ async function renderWeek(){
 
     renderDayBody(d, i);
   }
+
+  if(opts.scroll && isTodayWeek){
+    requestAnimationFrame(()=>{
+      const c = document.getElementById('card_' + todayIdx);
+      if(c) c.scrollIntoView({ block:'start' });
+    });
+  } else if(opts.scroll){
+    window.scrollTo(0, 0);
+  }
+
+  renderSummary();
+  renderNutriCard();
+  renderRaceCard();
+  renderRampCard();
 }
 
 function fieldsForMode(mode){
@@ -1603,7 +2133,7 @@ async function renderSwimBlock(d, idx){
       <div class="ex-check ${e.done?'done':''}" id="swimCheck_${idx}">${e.done?'✓':''}</div>
     </div>
     <div class="ex-inputs">
-      <div style="flex:1"><label>Largos (1 longitud = 1)</label><input type="number" inputmode="numeric" placeholder="—" id="swimLargos_${idx}" value="${e.largos||''}"></div>
+      <div style="flex:1"><label>Largos</label><input type="number" inputmode="numeric" placeholder="—" id="swimLargos_${idx}" value="${e.largos||''}"></div>
       <div style="flex:1"><label>Piscina (m)</label><input type="number" inputmode="decimal" id="swimPiscina_${idx}" value="${pool}"></div>
       <div style="flex:1"><label>Esfuerzo (1-10)</label><input type="number" inputmode="numeric" min="1" max="10" placeholder="—" id="swimRpe_${idx}" value="${e.rpe||''}"></div>
     </div>
@@ -1947,6 +2477,8 @@ async function updateBadge(idx){
   badge.classList.toggle('done', done);
   badge.textContent = done ? '✓' : '';
   if(nameEl) nameEl.classList.toggle('done-strike', done);
+  const chip = document.getElementById('chip_' + idx);
+  if(chip) chip.classList.toggle('done', done);
 }
 
 function switchView(view){
