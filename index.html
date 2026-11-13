@@ -470,6 +470,37 @@
   .profile-picker h2{font-size:22px;} .profile-picker p{font-size:15px;} .profile-btn{font-size:17px;}
 
   .swim-block .ex-inputs{align-items:flex-end;}
+
+/* ===== HÁBITOS ===== */
+.hb-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:12px 0;}
+.hb-head{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+.hb-ring{position:relative;width:64px;height:64px;flex:0 0 64px;}
+.hb-ring svg{width:64px;height:64px;transform:rotate(-90deg);}
+.hb-ring .bg{stroke:var(--card2);}
+.hb-ring .fg{stroke:var(--accent);transition:stroke-dashoffset .4s;}
+.hb-ring.full .fg{stroke:var(--green);}
+.hb-score{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;}
+.hb-title{font-size:13px;font-weight:700;}
+.hb-sub{font-size:11.5px;color:var(--text2);margin-top:2px;}
+.hb-edit{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:6px 10px;font-size:12px;}
+.hb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border);}
+.hb-list .hb-row:first-child{border-top:none;}
+.hb-check{width:26px;height:26px;flex:0 0 26px;border-radius:8px;border:2px solid var(--border);background:none;color:transparent;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;}
+.hb-check.done{background:var(--green);border-color:var(--green);color:#08301a;}
+.hb-check.rest{border-style:dashed;color:var(--muted);}
+.hb-label{font-size:13px;font-weight:500;flex:1;}
+.hb-meta{font-size:11px;color:var(--text2);margin-top:1px;}
+.hb-del{background:none;border:none;color:var(--red);font-size:13px;padding:4px 8px;}
+.hb-add{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.hb-add input,.hb-add select{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px;font-size:14px;}
+.hb-add input{flex:1;min-width:130px;}
+.hb-add button{background:var(--accent);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-weight:700;font-size:13px;}
+.hb-chart{display:flex;align-items:stretch;gap:3px;height:46px;margin-top:12px;}
+.hb-bar{flex:1;background:var(--card2);border-radius:3px;position:relative;overflow:hidden;}
+.hb-bar i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);display:block;}
+.hb-bar.full i{background:var(--green);}
+.hb-bar.today{outline:1px solid var(--text2);}
+.hb-chartlbl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:3px;}
 </style>
 </head>
 <body>
@@ -519,6 +550,7 @@
   </div>
 
   <div class="nutri-card" id="nutriCard"></div>
+  <div class="hb-card" id="habitsCard"></div>
   <div id="rampCard" style="display:none;"></div>
   <div class="summary-row" id="summaryRow"></div>
 
@@ -2024,6 +2056,7 @@ async function renderWeek(opts){
 
   renderSummary();
   renderNutriCard();
+  renderHabitsCard();
   renderRaceCard();
   renderRampCard();
 }
@@ -3257,6 +3290,180 @@ async function startApp(){
   let lastView = 'plan';
   try{ lastView = localStorage.getItem(uk('lastView')) || 'plan'; }catch(e){}
   if(lastView !== 'plan') switchView(lastView);
+}
+
+
+/* ===== HÁBITOS (datos en claves nuevas: usuario:habits:def y usuario:habits:done:fecha) ===== */
+let habitsEdit = false, habitsPendingDel = null;
+
+function hbShift(dateKey, n){
+  const p = dateKey.split('-').map(Number);
+  return toLocalISO(new Date(p[0], p[1]-1, p[2]+n));
+}
+async function hbSaveDefs(defs){
+  try{ await window.storage.set(uk('habits:def'), JSON.stringify(defs)); }catch(e){}
+}
+async function hbLoadDefs(){
+  try{
+    const res = await window.storage.get(uk('habits:def'));
+    if(res){ const a = JSON.parse(res.value); if(Array.isArray(a)) return a; }
+  }catch(e){}
+  if(currentUser === 'borja'){
+    const t = todayStr();
+    const seed = [
+      {id:'h_train', name:'Entrenamiento', every:1, auto:'train', since:t},
+      {id:'h_ingles', name:'Inglés', every:1, since:t},
+      {id:'h_focus', name:'Focus en el trabajo', every:1, since:t},
+      {id:'h_campo', name:'Mejoras en el campo', every:1, since:t},
+      {id:'h_proy', name:'Proyectos personales', every:1, since:t},
+      {id:'h_yo', name:'Tiempo para mí', every:1, since:t}
+    ];
+    await hbSaveDefs(seed);
+    return seed;
+  }
+  return [];
+}
+async function hbLoadDone(dateKey){
+  try{
+    const res = await window.storage.get(uk('habits:done:' + dateKey));
+    if(res){ const a = JSON.parse(res.value); if(Array.isArray(a)) return a; }
+  }catch(e){}
+  return [];
+}
+async function hbSaveDone(dateKey, arr){
+  try{ await window.storage.set(uk('habits:done:' + dateKey), JSON.stringify(arr)); }catch(e){}
+}
+async function hbDoneSet(dateKey, defs){
+  const s = new Set(await hbLoadDone(dateKey));
+  if(defs.some(h => h.auto === 'train') && await dayHasActivity(dateKey)){
+    defs.forEach(h => { if(h.auto === 'train') s.add(h.id); });
+  }
+  return s;
+}
+function hbStatus(h, dateKey, sets){
+  const cur = sets.get(dateKey);
+  if(cur && cur.has(h.id)) return {state:'done'};
+  if(h.since && dateKey < h.since) return {state:'na'};
+  const n = Math.max(1, h.every || 1);
+  for(let k = 1; k < n; k++){
+    const s = sets.get(hbShift(dateKey, -k));
+    if(s && s.has(h.id)) return {state:'rest', ago:k, next:n-k};
+  }
+  return {state:'due'};
+}
+function hbScore(defs, dateKey, sets){
+  let done = 0, total = 0;
+  defs.forEach(h => {
+    const st = hbStatus(h, dateKey, sets).state;
+    if(st === 'done'){ done++; total++; }
+    else if(st === 'due'){ total++; }
+  });
+  return {done, total};
+}
+function hbEveryLabel(n){ return n === 1 ? 'cada día' : (n === 7 ? 'cada semana' : 'cada ' + n + ' días'); }
+
+async function renderHabitsCard(){
+  const card = document.getElementById('habitsCard');
+  if(!card || !currentUser) return;
+  const dateKey = currentDate, today = todayStr();
+  const defs = await hbLoadDefs();
+  const maxN = Math.min(30, Math.max.apply(null, [1].concat(defs.map(h => h.every || 1))));
+  const span = 14;
+  const chartDays = [];
+  for(let i = span-1; i >= 0; i--) chartDays.push(hbShift(today, -i));
+  const need = new Set();
+  chartDays.concat([dateKey]).forEach(d => { for(let k = 0; k < maxN; k++) need.add(hbShift(d, -k)); });
+  const sets = new Map();
+  await Promise.all(Array.from(need).map(async d => { sets.set(d, await hbDoneSet(d, defs)); }));
+
+  const rows = defs.map(h => ({h, st: hbStatus(h, dateKey, sets)})).filter(x => x.st.state !== 'na');
+  const sc = hbScore(defs, dateKey, sets);
+  const C = 2 * Math.PI * 26;
+  const frac = sc.total ? sc.done / sc.total : 0;
+  const editing = habitsEdit || defs.length === 0;
+  const canToggle = dateKey <= today;
+
+  let html = '<div class="hb-head">' +
+    '<div class="hb-ring' + (sc.total && sc.done === sc.total ? ' full' : '') + '">' +
+    '<svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="26" fill="none" stroke-width="7"/>' +
+    '<circle class="fg" cx="32" cy="32" r="26" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + C.toFixed(2) + '" stroke-dashoffset="' + (C * (1 - frac)).toFixed(2) + '"/></svg>' +
+    '<div class="hb-score">' + sc.done + '/' + sc.total + '</div></div>' +
+    '<div><div class="hb-title">Hábitos' + (dateKey === today ? ' de hoy' : ' · ' + fmtDM(dateKey)) + '</div>' +
+    '<div class="hb-sub">' + (defs.length === 0 ? 'Define tus hábitos para empezar' : (sc.total && sc.done === sc.total ? 'Objetivos del día completados' : (sc.total - sc.done) + ' por cumplir')) + '</div></div>' +
+    '<button class="hb-edit" data-act="edit">' + (editing && defs.length ? 'Listo' : 'Editar') + '</button></div>';
+
+  html += '<div class="hb-list">';
+  rows.forEach(x => {
+    const h = x.h, st = x.st.state;
+    let meta = '';
+    if(h.auto === 'train') meta = 'Automático según tu registro';
+    else if(st === 'rest') meta = 'Hecho hace ' + x.st.ago + (x.st.ago === 1 ? ' día' : ' días') + ' · toca en ' + x.st.next + (x.st.next === 1 ? ' día' : ' días');
+    else if((h.every || 1) > 1) meta = hbEveryLabel(h.every);
+    const clickable = !h.auto && canToggle;
+    html += '<div class="hb-row">' +
+      '<button class="hb-check ' + (st === 'done' ? 'done' : (st === 'rest' ? 'rest' : '')) + '"' + (clickable ? ' data-act="toggle" data-id="' + h.id + '"' : ' disabled') + '>' + (st === 'done' ? '✓' : (st === 'rest' ? '·' : '')) + '</button>' +
+      '<div class="hb-label">' + escapeHtml(h.name) + (meta ? '<div class="hb-meta">' + meta + '</div>' : '') + '</div>' +
+      (editing ? '<button class="hb-del" data-act="del" data-id="' + h.id + '">' + (habitsPendingDel === h.id ? '¿Seguro?' : '✕') + '</button>' : '') +
+      '</div>';
+  });
+  html += '</div>';
+
+  if(editing){
+    html += '<div class="hb-add"><input id="hbName" maxlength="40" placeholder="Nuevo hábito (ej. Leer 20 min)">' +
+      '<select id="hbEvery">' +
+      [1,2,3,4,5,7,14].map(n => '<option value="' + n + '">' + hbEveryLabel(n) + '</option>').join('') +
+      '</select><button data-act="add">Añadir</button></div>';
+  }
+
+  if(defs.length){
+    let sum = 0, cnt = 0;
+    const bars = chartDays.map(d => {
+      const s = hbScore(defs, d, sets);
+      const pct = s.total ? Math.round(100 * s.done / s.total) : 0;
+      if(s.total){ sum += pct; cnt++; }
+      return '<div class="hb-bar' + (s.total && s.done === s.total ? ' full' : '') + (d === dateKey ? ' today' : '') + '" title="' + fmtDM(d) + ': ' + s.done + '/' + s.total + '"><i style="height:' + pct + '%"></i></div>';
+    }).join('');
+    html += '<div class="hb-chart">' + bars + '</div>' +
+      '<div class="hb-chartlbl"><span>' + fmtDM(chartDays[0]) + '</span><span>Últimos 14 días' + (cnt ? ' · media ' + Math.round(sum / cnt) + '%' : '') + '</span><span>hoy</span></div>';
+  }
+
+  card.className = 'hb-card';
+  card.innerHTML = html;
+
+  card.onclick = async (e) => {
+    const b = e.target.closest('[data-act]');
+    if(!b) return;
+    const act = b.dataset.act, id = b.dataset.id;
+    if(act === 'toggle'){
+      const arr = await hbLoadDone(dateKey);
+      const i = arr.indexOf(id);
+      if(i >= 0) arr.splice(i, 1); else arr.push(id);
+      await hbSaveDone(dateKey, arr);
+    } else if(act === 'edit'){
+      habitsEdit = !habitsEdit; habitsPendingDel = null;
+    } else if(act === 'del'){
+      if(habitsPendingDel !== id){ habitsPendingDel = id; }
+      else {
+        const cur = await hbLoadDefs();
+        await hbSaveDefs(cur.filter(h => h.id !== id));
+        habitsPendingDel = null;
+      }
+    } else if(act === 'add'){
+      const name = (document.getElementById('hbName').value || '').trim().slice(0, 40);
+      if(!name) return;
+      const every = parseInt(document.getElementById('hbEvery').value, 10) || 1;
+      const cur = await hbLoadDefs();
+      cur.push({id:'h_' + Date.now().toString(36), name:name, every:every, since:todayStr()});
+      await hbSaveDefs(cur);
+    }
+    renderHabitsCard();
+  };
+  card.onkeydown = (e) => {
+    if(e.key === 'Enter' && e.target && e.target.id === 'hbName'){
+      const btn = card.querySelector('[data-act="add"]');
+      if(btn) btn.click();
+    }
+  };
 }
 
 initProfile();
