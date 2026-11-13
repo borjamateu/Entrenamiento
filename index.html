@@ -501,6 +501,12 @@
 .hb-bar.full i{background:var(--green);}
 .hb-bar.today{outline:1px solid var(--text2);}
 .hb-chartlbl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:3px;}
+
+.hb-prow{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;}
+.hb-pname{flex:0 0 38%;}
+.hb-pbar{flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden;position:relative;}
+.hb-pbar i{display:block;height:100%;background:var(--accent);}
+.hb-pval{flex:0 0 44px;text-align:right;color:var(--text2);font-size:11px;}
 </style>
 </head>
 <body>
@@ -549,7 +555,7 @@
     <div class="week" id="weekList"></div>
   </div>
 
-  <div class="nutri-card" id="nutriCard"></div>
+  
   <div class="hb-card" id="habitsCard"></div>
   <div id="rampCard" style="display:none;"></div>
   <div class="summary-row" id="summaryRow"></div>
@@ -2055,7 +2061,6 @@ async function renderWeek(opts){
   }
 
   renderSummary();
-  renderNutriCard();
   renderHabitsCard();
   renderRaceCard();
   renderRampCard();
@@ -2800,7 +2805,14 @@ async function renderComparativaCard(){
     ? `Datos de ${USER_LABEL[other]}: semana ${data.weekOf || ''} (última exportación ${data.updated})`
     : `Aún no hay datos de ${USER_LABEL[other]} — en cuanto exporte su historial y me lo paséis, lo actualizo aquí.`;
 
-  return `
+      let myHb7 = null, otherHb7 = null;
+    try{
+      const m = await hbCollect(currentUser, 7); if(m) myHb7 = m.pct7;
+      const o = await hbCollect(other, 7);
+      if(o) otherHb7 = o.pct7; else if(otherData && otherData.habitos7 != null) otherHb7 = otherData.habitos7;
+    }catch(e){}
+    const fpct = (v) => v == null ? '—' : v + '%';
+    return `
     <div class="prog-card">
       <div class="prog-title">🆚 ${USER_LABEL[currentUser]} vs ${USER_LABEL[other]}</div>
       <div class="prog-sub">${updatedNote}</div>
@@ -2840,6 +2852,19 @@ async function renderComparativaCard(){
           <div class="compare-sub">corridos esta semana</div>
         </div>
       </div>
+    
+    <div class="compare-row">
+      <div class="compare-col">
+        <div class="compare-name">${USER_LABEL[currentUser]} (tú)</div>
+        <div class="compare-val">${fpct(myHb7)}</div>
+        <div class="compare-sub">hábitos cumplidos (7 días)</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-name">${USER_LABEL[other]}</div>
+        <div class="compare-val">${fpct(otherHb7)}</div>
+        <div class="compare-sub">hábitos cumplidos (7 días)</div>
+      </div>
+    </div>
     </div>`;
 }
 
@@ -2922,7 +2947,8 @@ async function renderProgress(){
       ${svgBarChart(weeklyKmBars, {flat:true, showValue:true})}
     </div>`;
 
-  html += await renderComparativaCard();
+  html += await renderHabitsProgressCard();
+    html += await renderComparativaCard();
 
   if(names.length>0){
     const options = names.map(n=> `<option value="${n}" ${n===progSelectedName?'selected':''}>${n}</option>`).join('');
@@ -3306,19 +3332,39 @@ async function hbSaveDefs(defs){
 async function hbLoadDefs(){
   try{
     const res = await window.storage.get(uk('habits:def'));
-    if(res){ const a = JSON.parse(res.value); if(Array.isArray(a)) return a; }
+    if(res){
+      const a = JSON.parse(res.value);
+      if(Array.isArray(a)){
+        if(currentUser === 'borja'){
+          let flag = null;
+          try{ flag = await window.storage.get(uk('habits:mig1')); }catch(e){}
+          if(!flag){
+            const t = todayStr();
+            [{id:'h_nutri', name:'Nutrición'}, {id:'h_skin', name:'Skincare'}].forEach(n => {
+              if(!a.some(h => h.id === n.id)) a.push({id:n.id, name:n.name, every:1, since:t});
+            });
+            await hbSaveDefs(a);
+            try{ await window.storage.set(uk('habits:mig1'), '1'); }catch(e){}
+          }
+        }
+        return a;
+      }
+    }
   }catch(e){}
   if(currentUser === 'borja'){
     const t = todayStr();
     const seed = [
       {id:'h_train', name:'Entrenamiento', every:1, auto:'train', since:t},
+      {id:'h_nutri', name:'Nutrición', every:1, since:t},
       {id:'h_ingles', name:'Inglés', every:1, since:t},
       {id:'h_focus', name:'Focus en el trabajo', every:1, since:t},
       {id:'h_campo', name:'Mejoras en el campo', every:1, since:t},
       {id:'h_proy', name:'Proyectos personales', every:1, since:t},
-      {id:'h_yo', name:'Tiempo para mí', every:1, since:t}
+      {id:'h_yo', name:'Tiempo para mí', every:1, since:t},
+      {id:'h_skin', name:'Skincare', every:1, since:t}
     ];
     await hbSaveDefs(seed);
+    try{ await window.storage.set(uk('habits:mig1'), '1'); }catch(e){}
     return seed;
   }
   return [];
@@ -3464,6 +3510,81 @@ async function renderHabitsCard(){
       if(btn) btn.click();
     }
   };
+}
+
+
+/* ===== HÁBITOS en Progreso y comparativa ===== */
+async function hbCollect(u, days){
+  let defs = [];
+  try{
+    const r = await window.storage.get(u + ':habits:def');
+    if(r){ const a = JSON.parse(r.value); if(Array.isArray(a)) defs = a; }
+  }catch(e){}
+  if(!defs.length) return null;
+  const maxN = Math.min(30, Math.max.apply(null, [1].concat(defs.map(h => h.every || 1))));
+  const today = todayStr();
+  const dayList = [];
+  for(let i = days - 1; i >= 0; i--) dayList.push(hbShift(today, -i));
+  const need = new Set();
+  dayList.forEach(d => { for(let k = 0; k < maxN; k++) need.add(hbShift(d, -k)); });
+  const hasTrain = defs.some(h => h.auto === 'train');
+  const sets = new Map();
+  await Promise.all(Array.from(need).map(async d => {
+    const s = new Set();
+    try{
+      const r = await window.storage.get(u + ':habits:done:' + d);
+      if(r){ const a = JSON.parse(r.value); if(Array.isArray(a)) a.forEach(x => s.add(x)); }
+    }catch(e){}
+    if(hasTrain){
+      try{
+        const r = await window.storage.get(u + ':log:' + d);
+        const log = r ? JSON.parse(r.value) : {};
+        const act = Object.entries(log).some(([k, v]) => {
+          if(k.startsWith('customlist_') || k.startsWith('comment_')) return false;
+          if(!v || typeof v !== 'object') return false;
+          return v.done || hasLoggedValue(v);
+        });
+        if(act) defs.forEach(h => { if(h.auto === 'train') s.add(h.id); });
+      }catch(e){}
+    }
+    sets.set(d, s);
+  }));
+  const perDay = dayList.map(d => { const sc = hbScore(defs, d, sets); return {d:d, done:sc.done, total:sc.total}; });
+  const perHabit = defs.map(h => {
+    let done = 0, total = 0;
+    dayList.forEach(d => {
+      const st = hbStatus(h, d, sets).state;
+      if(st === 'done'){ done++; total++; } else if(st === 'due'){ total++; }
+    });
+    return {h:h, done:done, total:total};
+  });
+  const pct = (arr) => {
+    const dn = arr.reduce((s, x) => s + x.done, 0), tt = arr.reduce((s, x) => s + x.total, 0);
+    return tt ? Math.round(100 * dn / tt) : null;
+  };
+  return {defs:defs, perDay:perDay, perHabit:perHabit, pct7:pct(perDay.slice(-7)), pctAll:pct(perDay)};
+}
+
+async function renderHabitsProgressCard(){
+  const st = await hbCollect(currentUser, 30);
+  const head = '<div class="prog-card"><div class="prog-title">✅ Hábitos</div>';
+  if(!st) return head + '<div class="prog-sub">Aún no hay hábitos definidos. Créalos desde la pestaña Plan.</div></div>';
+  const fp = (v) => v == null ? '—' : v + '%';
+  let html = head + '<div class="prog-sub">Objetivos cumplidos sobre los que tocaban</div>' +
+    '<div class="compare-row">' +
+    '<div class="compare-col"><div class="compare-val">' + fp(st.pct7) + '</div><div class="compare-sub">últimos 7 días</div></div>' +
+    '<div class="compare-col"><div class="compare-val">' + fp(st.pctAll) + '</div><div class="compare-sub">últimos 30 días</div></div></div>';
+  st.perHabit.forEach(x => {
+    const p = x.total ? Math.round(100 * x.done / x.total) : 0;
+    html += '<div class="hb-prow"><div class="hb-pname">' + escapeHtml(x.h.name) + '</div><div class="hb-pbar"><i style="width:' + p + '%"></i></div><div class="hb-pval">' + (x.total ? x.done + '/' + x.total : '—') + '</div></div>';
+  });
+  const last = st.perDay.slice(-14);
+  const bars = last.map(d => {
+    const pct = d.total ? Math.round(100 * d.done / d.total) : 0;
+    return '<div class="hb-bar' + (d.total && d.done === d.total ? ' full' : '') + '" title="' + fmtDM(d.d) + ': ' + d.done + '/' + d.total + '"><i style="height:' + pct + '%"></i></div>';
+  }).join('');
+  html += '<div class="hb-chart">' + bars + '</div><div class="hb-chartlbl"><span>' + fmtDM(last[0].d) + '</span><span>Cumplimiento diario</span><span>hoy</span></div>';
+  return html + '</div>';
 }
 
 initProfile();
